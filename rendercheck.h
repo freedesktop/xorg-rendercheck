@@ -50,11 +50,22 @@ struct op_info {
 	char *name;
 };
 
+#define TEST_FILL		0x0001
+#define TEST_DSTCOORDS		0x0002
+#define TEST_SRCCOORDS		0x0004
+#define TEST_MASKCOORDS		0x0008
+#define TEST_TSRCCOORDS		0x0010
+#define TEST_TMASKCOORDS	0x0020
+#define TEST_BLEND		0x0040
+#define TEST_COMPOSITE		0x0080
+#define TEST_CACOMPOSITE	0x0100
+
 extern int pixmap_move_iter;
 extern int win_width, win_height;
 extern struct op_info ops[];
 extern Bool is_verbose;
 extern color4d colors[];
+extern int enabled_tests;
 
 /* main.c */
 void

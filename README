@@ -7,7 +7,3 @@ Tests currently include:
 - Transformed (FilterNearest) source coordinates correctness.
 - Composite with and without mask (with/without component alpha), with 1x1
   repeating Pictures and 10x10 Pictures.
-
-Unfortunately, there are currently no command-line arguments to control
-its execution.  Options, such as verbosity or number of iterations to encourage
-pixmap migration, are controlled only in source.

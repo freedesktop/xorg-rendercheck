@@ -33,6 +33,7 @@ extern int num_ops;
 extern int num_colors;
 
 int is_verbose = FALSE;
+int enabled_tests = ~0;		/* Enable all tests by default */
 
 /* Number of times to repeat operations so that pixmaps will tend to get moved
  * into offscreen memory and allow hardware acceleration.
@@ -107,7 +108,8 @@ describe_format(char *desc, int len, XRenderPictFormat *format)
 static void
 usage (char *program)
 {
-    fprintf(stderr, "usage: %s [-d display] [-v]\n", program);
+    fprintf(stderr, "usage: %s [-d display] [-v] [-t test1,test2,...]\n",
+	program);
     exit(1);
 }
 
@@ -120,11 +122,46 @@ int main(int argc, char **argv)
 	XSetWindowAttributes as;
 	picture_info window;
 	char *display = NULL;
+	char *test, *nextname;
 
-	while ((o = getopt (argc, argv, "d:v")) != -1) {
+	while ((o = getopt (argc, argv, "d:i:t:v")) != -1) {
 		switch (o) {
 		case 'd':
 			display = optarg;
+			break;
+		case 'i':
+			pixmap_move_iter = atoi(optarg);
+			break;
+		case 't':
+			nextname = optarg;
+
+			/* disable all tests */
+			enabled_tests = 0;
+
+			while ((test = strsep(&nextname, ",")) != NULL) {
+				if (strcmp(test, "fill") == 0) {
+					enabled_tests |= TEST_FILL;
+				} else if (strcmp(test, "dcoords") == 0) {
+					enabled_tests |= TEST_DSTCOORDS;
+				} else if (strcmp(test, "scoords") == 0) {
+					enabled_tests |= TEST_SRCCOORDS;
+				} else if (strcmp(test, "mcoords") == 0) {
+					enabled_tests |= TEST_MASKCOORDS;
+				} else if (strcmp(test, "tscoords") == 0) {
+					enabled_tests |= TEST_TSRCCOORDS;
+				} else if (strcmp(test, "tmcoords") == 0) {
+					enabled_tests |= TEST_TMASKCOORDS;
+				} else if (strcmp(test, "blend") == 0) {
+					enabled_tests |= TEST_BLEND;
+				} else if (strcmp(test, "composite") == 0) {
+					enabled_tests |= TEST_COMPOSITE;
+				} else if (strcmp(test, "cacomposite") == 0) {
+					enabled_tests |= TEST_CACOMPOSITE;
+				} else {
+					usage(argv[0]);
+				}
+			}
+			
 			break;
 		case 'v':
 			is_verbose = TRUE;
