@@ -1,4 +1,5 @@
 bin_PROGRAMS = rendercheck
+man_MANS = rendercheck.1
 
 rendercheck_SOURCES = \
 	main.c \
@@ -9,4 +10,6 @@ rendercheck_SOURCES = \
 rendercheck_CFLAGS = $(RC_CFLAGS)
 rendercheck_LDADD = $(RC_LIBS)
 
-EXTRA_DIST = autogen.sh
+EXTRA_DIST = \
+	autogen.sh \
+	${man_MANS}

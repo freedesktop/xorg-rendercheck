@@ -27,12 +27,13 @@
 #include <stdio.h>
 #include <err.h>
 #include <string.h>
+#include <getopt.h>
 
 extern int num_ops;
 extern int num_colors;
 extern color4d colors[];
 
-int is_verbose = FALSE; /* XXX: Make me a command line arg */
+int is_verbose = FALSE;
 
 /* Number of times to repeat operations so that pixmaps will tend to get moved
  * into offscreen memory and allow hardware acceleration.
@@ -103,16 +104,41 @@ describe_format(char *desc, int len, XRenderPictFormat *format)
 	}
 }
 
+
+static void
+usage (char *program)
+{
+    fprintf(stderr, "usage: %s [-d display] [-v]\n", program);
+    exit(1);
+}
+
 int main(int argc, char **argv)
 {
 	Display *dpy;
 	XEvent ev;
-	int i, maj, min;
+	int i, o, maj, min;
 	XWindowAttributes a;
 	XSetWindowAttributes as;
 	picture_info window;
+	char *display = NULL;
 
-	dpy = XOpenDisplay(0);
+	while ((o = getopt (argc, argv, "d:v")) != -1) {
+		switch (o) {
+		case 'd':
+			display = optarg;
+			break;
+		case 'v':
+			is_verbose = TRUE;
+			break;
+		default:
+			usage(argv[0]);
+			break;
+		}
+	}
+
+	dpy = XOpenDisplay(display);
+	if (dpy == NULL)
+		errx(1, "Couldn't open display.");
 
 	if (!XRenderQueryExtension(dpy, &i, &i))
 		errx(1, "Render extension missing.");
@@ -149,7 +175,6 @@ int main(int argc, char **argv)
 	strncat(window.name, " window", 20);
 	XSelectInput(dpy, window.d, ExposureMask);
 	XMapWindow(dpy, window.d);
-
 
 	/* We have to premultiply the alpha into the r, g, b values of the
 	 * sample colors.  Render colors are premultiplied with alpha, so r,g,b
