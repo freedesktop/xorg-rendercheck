@@ -17,5 +17,10 @@ INCLUDES = $(RC_CFLAGS)
 rendercheck_LDADD = $(RC_LIBS)
 
 EXTRA_DIST = \
+	AUTHORS \
+	COPYING \
+	INSTALL \
+	README \
+	TODO \
 	autogen.sh \
 	${man_MANS}
