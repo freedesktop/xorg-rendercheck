@@ -126,11 +126,7 @@ get_pixel(Display *dpy, picture_info *pi, int x, int y, color4d *color)
 	unsigned long val;
 	unsigned long rm, gm, bm, am;
 
-	/* XXX: I am xlib clueless, and this function appears to not work right.
-	 * I think it just always gets the 0,0 pixel, but I'm not sure.
-	 */
 	image = XGetImage(dpy, pi->d, x, y, 1, 1, 0xffffffff, ZPixmap);
-	/*val = image->f.get_pixel(image, x, y);*/
 
 	val = *(unsigned long *)image->data;
 
@@ -192,20 +188,16 @@ eval_diff(char *name, color4d *expected, color4d *test, int x, int y,
 }
 
 static Bool
-fill_test(Display *dpy, picture_info *win, picture_info *src, picture_info *dst)
+fill_test(Display *dpy, picture_info *win, picture_info *src)
 {
-	color4d expected, tested;
+	color4d tested;
 
-	XRenderComposite(dpy, PictOpSrc, src->pict, 0, dst->pict, 0, 0, 0, 0,
-	    0, 0, win_width, win_height);
-	get_pixel(dpy, dst, 0, 0, &tested);
+	get_pixel(dpy, src, 0, 0, &tested);
 	/* Copy the output to the window, so the user sees something visual. */
-	XRenderComposite(dpy, PictOpSrc, dst->pict, 0, win->pict, 0, 0, 0, 0,
+	XRenderComposite(dpy, PictOpSrc, src->pict, 0, win->pict, 0, 0, 0, 0,
 	    0, 0, win_width, win_height);
 
-	expected = src->color;
-	color_correct(dst, &expected);
-	return eval_diff("fill", &expected, &tested, 0, 0, is_verbose);
+	return eval_diff("fill", &src->color, &tested, 0, 0, is_verbose);
 }
 
 static Bool
@@ -226,7 +218,7 @@ destcoords_test(Display *dpy, picture_info *win, picture_info *dst,
 
 	for (x = 0; x < 3; x++) {
 		for (y = 0; y < 3; y++) {
-			get_pixel(dpy, dst, 0, 0, &tested);
+			get_pixel(dpy, dst, x, y, &tested);
 			if (x == 1 && y == 1)
 				expected = fg->color;
 			else
@@ -574,11 +566,14 @@ begin_test(Display *dpy, picture_info *win)
 		    &color, x, y, 1, 1);
 	}
 
-	printf("Beginning fill test\n");
-	for (i = 0; i < num_dests; i++) {
-	    for (j = 0; j < num_colors * num_formats; j++) {
-		fill_test(dpy, win, &pictures_1x1[j], &dests[i]);
-	    }
+	printf("Beginning testing of filling of 1x1R pictures\n");
+	for (i = 0; i < num_colors * num_formats; i++) {
+		fill_test(dpy, win, &pictures_1x1[i]);
+	}
+
+	printf("Beginning testing of filling of 10x10 pictures\n");
+	for (i = 0; i < num_colors * num_formats; i++) {
+		fill_test(dpy, win, &pictures_10x10[i]);
 	}
 
 	printf("Beginning dest coords test\n");

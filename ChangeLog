@@ -1,0 +1,12 @@
+2004-05-16  Eric Anholt  <anholt@FreeBSD.org>
+
+	* TODO:
+	* tests.c: (get_pixel), (fill_test), (destcoords_test),
+	(begin_test):
+	- get_pixel was not at fault, and get destcoords_test working.
+	- Change fill_test from being a duplication of the blend tests
+	  to a test of whether the XRenderFillRectangle()s produced the
+	  expected results.
+	- Update TODO list.
+	- Bump version to 1.0.1.
+

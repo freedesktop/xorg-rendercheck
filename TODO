@@ -1,5 +1,5 @@
-- Fix dest coords check (get_pixel broken)
 - Get a useful number being produced for error values, and correct eval_diff's limit.
 - Check transforms
 - check source/mask pixels falling outside the drawable.
 - Command line args for verbosity, what tests, move iter, etc.
+- Check repeating of sources with various sizes.
