@@ -39,8 +39,8 @@ int is_verbose = FALSE; /* XXX: Make me a command line arg */
  */
 int pixmap_move_iter = 1;
 
-int win_width = 10;
-int win_height = 10;
+int win_width = 40;
+int win_height = 40;
 
 static int
 bit_count(int i)

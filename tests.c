@@ -98,6 +98,14 @@ int target_colors[5][5] = {
 	{1, 1, 1, 1, 1},
 };
 
+int dot_colors[5][5] = {
+	{7, 7, 7, 7, 7},
+	{7, 7, 7, 7, 7},
+	{7, 0, 7, 7, 7},
+	{7, 7, 7, 7, 7},
+	{7, 7, 7, 7, 7},
+};
+
 #define round_pix(pix, mask) \
 	((double)((int)(pix * (mask ) + .5)) / (double)(mask))
 
@@ -302,6 +310,86 @@ srccoords_test(Display *dpy, picture_info *win, picture_info *src,
 	return !failed;
 }
 
+/* Scale the source image (which contains a single white pixel on a background of
+ * transparent) and check coordinates.
+ */
+static Bool
+trans_coords_test(Display *dpy, picture_info *win, picture_info *src,
+    picture_info *white, Bool test_mask)
+{
+	color4d expected, tested;
+	int x, y;
+	XRenderPictureAttributes pa;
+	Bool failed = FALSE;
+	int tested_colors[40][40], expected_colors[40][40];
+	XTransform t;
+
+	t.matrix[0][0] = 1.0; t.matrix[0][1] = 0.0; t.matrix[0][2] = 0.0;
+	t.matrix[1][0] = 0.0; t.matrix[1][1] = 1.0; t.matrix[1][2] = 0.0;
+	t.matrix[2][0] = 0.0; t.matrix[2][1] = 0.0; t.matrix[2][2] = 8;
+	XRenderSetPictureTransform(dpy, src->pict, &t);
+
+	if (!test_mask)
+		XRenderComposite(dpy, PictOpSrc, src->pict, 0,
+		    win->pict, 0, 0, 0, 0, 0, 0, 40, 40);
+	else {
+		XRenderComposite(dpy, PictOpSrc, white->pict, src->pict,
+		    win->pict, 0, 0, 0, 0, 0, 0, 40, 40);
+	}
+
+	for (x = 0; x < 40; x++) {
+	    for (y = 0; y < 40; y++) {
+		int src_sample_x, src_sample_y;
+
+		/* XXX: The protocol document doesn't specify if the transformed
+		 * coordinates are rounded or truncated.  Assume truncate.
+		 */
+		src_sample_x = x / 8;
+		src_sample_y = y / 8;
+		expected_colors[x][y] = dot_colors[src_sample_x][src_sample_y];
+
+		get_pixel(dpy, win, x, y, &tested);
+
+		if (tested.r == 1.0 && tested.g == 1.0 && tested.b == 1.0) {
+			tested_colors[x][y] = 0;
+		} else if (tested.r == 0.0 && tested.g == 0.0 &&
+		    tested.b == 0.0) {
+			tested_colors[x][y] = 7;
+		} else {
+			tested_colors[x][y] = 9;
+		}
+		if (tested_colors[x][y] != expected_colors[x][y])
+			failed = TRUE;
+	    }
+	}
+
+	if (failed) {
+		printf("%s transform coordinates test failed.\n",
+		    test_mask ? "mask" : "src");
+		printf("expected vs tested:\n");
+		for (y = 0; y < 40; y++) {
+			for (x = 0; x < 40; x++)
+				printf("%d", expected_colors[x][y]);
+			printf(" ");
+			for (x = 0; x < 40; x++)
+				printf("%d", tested_colors[x][y]);
+			printf("\n");
+		}
+		printf(" vs tested (same)\n");
+		for (y = 0; y < 40; y++) {
+			for (x = 0; x < 40; x++)
+				printf("%d", tested_colors[x][y]);
+			printf("\n");
+		}
+	}
+	t.matrix[0][0] = 1.0; t.matrix[0][1] = 0.0; t.matrix[0][2] = 0.0;
+	t.matrix[1][0] = 0.0; t.matrix[1][1] = 1.0; t.matrix[1][2] = 0.0;
+	t.matrix[2][0] = 0.0; t.matrix[2][1] = 0.0; t.matrix[2][2] = 1.0;
+	XRenderSetPictureTransform(dpy, src->pict, &t);
+
+	return !failed;
+}
+
 static Bool
 blend_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     picture_info *src_color, picture_info *dst_color)
@@ -422,7 +510,7 @@ begin_test(Display *dpy, picture_info *win)
 	int i, j, src, dst, mask;
 	int num_dests, num_formats;
 	picture_info *dests, *pictures_1x1, *pictures_10x10, picture_3x3;
-	picture_info picture_target;
+	picture_info picture_target, picture_dot;
 
 	num_dests = 3;
 	dests = (picture_info *)malloc(num_dests * sizeof(dests[0]));
@@ -567,6 +655,27 @@ begin_test(Display *dpy, picture_info *win)
 		XRenderFillRectangle(dpy, PictOpSrc, picture_target.pict,
 		    &color, x, y, 1, 1);
 	}
+	picture_dot.d = XCreatePixmap(dpy, RootWindow(dpy, 0), 5, 5, 32);
+	picture_dot.format = XRenderFindStandardFormat(dpy,
+	    PictStandardARGB32);
+	picture_dot.pict = XRenderCreatePicture(dpy, picture_dot.d,
+	    picture_dot.format, 0, NULL);
+	picture_dot.name = "dot picture";
+	for (i = 0; i < 25; i++) {
+		int x = i % 5;
+		int y = i / 5;
+		XRenderColor color;
+		int tc;
+
+		tc = dot_colors[x][y];
+
+		color.red = colors[tc].r * 65535;
+		color.green = colors[tc].g * 65535;
+		color.blue = colors[tc].b * 65535;
+		color.alpha = colors[tc].a * 65535;
+		XRenderFillRectangle(dpy, PictOpSrc, picture_dot.pict,
+		    &color, x, y, 1, 1);
+	}
 
 	printf("Beginning testing of filling of 1x1R pictures\n");
 	for (i = 0; i < num_colors * num_formats; i++) {
@@ -588,6 +697,12 @@ begin_test(Display *dpy, picture_info *win)
 
 	printf("Beginning mask coords test\n");
 	srccoords_test(dpy, win, &picture_target, &pictures_1x1[0], TRUE);
+
+	printf("Beginning transformed src coords test\n");
+	trans_coords_test(dpy, win, &picture_dot, &pictures_1x1[0], FALSE);
+
+	printf("Beginning transformed mask coords test\n");
+	trans_coords_test(dpy, win, &picture_dot, &pictures_1x1[0], TRUE);
 
 	for (i = 0; i < num_ops; i++) {
 	    for (j = 0; j <= num_dests; j++) {
