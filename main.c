@@ -109,6 +109,7 @@ int main(int argc, char **argv)
 	XEvent ev;
 	int i, maj, min;
 	XWindowAttributes a;
+	XSetWindowAttributes as;
 	picture_info window;
 
 	dpy = XOpenDisplay(0);
@@ -132,6 +133,10 @@ int main(int argc, char **argv)
 
 	window.d = XCreateSimpleWindow(dpy, RootWindow(dpy, 0), 0, 0, win_width,
 	    win_height, 0, 0, WhitePixel(dpy, 0));
+
+	as.override_redirect = True;
+	XChangeWindowAttributes(dpy, window.d, CWOverrideRedirect, &as);
+
 	XGetWindowAttributes(dpy, window.d, &a);
 	window.format = XRenderFindVisualFormat(dpy, a.visual);
 	window.pict = XRenderCreatePicture(dpy, window.d,
