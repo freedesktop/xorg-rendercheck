@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.57)
 AC_INIT([rendercheck],
-        1.0.2,
+        1.0.3,
         [anholt@FreeBSD.org],
         rendercheck)
 
@@ -18,7 +18,22 @@ AM_MAINTAINER_MODE
 AC_PROG_CC
 
 # Checks for pkg-config packages
-PKG_CHECK_MODULES(RC, xrender)
+PKG_CHECK_MODULES(RC, xrender,
+		  [xrender_found_with_pkgconfig=yes],
+		  [xrender_found_with_pkgconfig=no])
+
+if test "$xrender_found_with_pkgconfig" = "no"
+then
+	AC_PATH_XTRA
+	if test "x$no_x" = "xyes"
+	then
+		AC_MSG_ERROR([X is required, but it was either disabled or not found.])
+	fi
+
+	RC_CFLAGS="$X_CFLAGS"
+	RC_LIBS="$X_LIBS -lXrender -lXext -lX11"
+fi
+
 AC_SUBST(RC_CFLAGS)
 AC_SUBST(RC_LIBS)
 

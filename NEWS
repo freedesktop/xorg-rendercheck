@@ -1,3 +1,7 @@
+2004-10-24:
+	Version 1.0.3 released.
+	Allows building on systems without xrender.pc
+
 2004-09-19:
 	Version 1.0.2 released.
 	Adds a transformed coordinates test.
