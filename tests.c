@@ -321,7 +321,7 @@ trans_coords_test(Display *dpy, picture_info *win, picture_info *src,
 	int x, y;
 	XRenderPictureAttributes pa;
 	Bool failed = FALSE;
-	int tested_colors[35][35], expected_colors[35][35];
+	int tested_colors[40][40], expected_colors[40][40];
 	XTransform t;
 
 	t.matrix[0][0] = 1.0; t.matrix[0][1] = 0.0; t.matrix[0][2] = 0.0;
@@ -331,22 +331,18 @@ trans_coords_test(Display *dpy, picture_info *win, picture_info *src,
 
 	if (!test_mask)
 		XRenderComposite(dpy, PictOpSrc, src->pict, 0,
-		    win->pict, 0, 0, 0, 0, 0, 0, 35, 35);
+		    win->pict, 0, 0, 0, 0, 0, 0, 40, 40);
 	else {
 		XRenderComposite(dpy, PictOpSrc, white->pict, src->pict,
-		    win->pict, 0, 0, 0, 0, 0, 0, 35, 35);
+		    win->pict, 0, 0, 0, 0, 0, 0, 40, 40);
 	}
 
-	/* Only pay attention to the first 35 pixels, as we aren't expecting
-	 * errors beyond that, and then we don't hit rounding-out-of-bounds
-	 * issues on our expected source coords.
-	 */
-	for (x = 0; x < 35; x++) {
-	    for (y = 0; y < 35; y++) {
+	for (x = 0; x < 40; x++) {
+	    for (y = 0; y < 40; y++) {
 		int src_sample_x, src_sample_y;
 
-		src_sample_x = (x + 4) / 8;
-		src_sample_y = (y + 4) / 8;
+		src_sample_x = x / 8;
+		src_sample_y = y / 8;
 		expected_colors[x][y] = dot_colors[src_sample_x][src_sample_y];
 
 		get_pixel(dpy, win, x, y, &tested);
@@ -368,17 +364,17 @@ trans_coords_test(Display *dpy, picture_info *win, picture_info *src,
 		printf("%s transform coordinates test failed.\n",
 		    test_mask ? "mask" : "src");
 		printf("expected vs tested:\n");
-		for (y = 0; y < 35; y++) {
-			for (x = 0; x < 35; x++)
+		for (y = 0; y < 40; y++) {
+			for (x = 0; x < 40; x++)
 				printf("%d", expected_colors[x][y]);
 			printf(" ");
-			for (x = 0; x < 35; x++)
+			for (x = 0; x < 40; x++)
 				printf("%d", tested_colors[x][y]);
 			printf("\n");
 		}
 		printf(" vs tested (same)\n");
-		for (y = 0; y < 35; y++) {
-			for (x = 0; x < 35; x++)
+		for (y = 0; y < 40; y++) {
+			for (x = 0; x < 40; x++)
 				printf("%d", tested_colors[x][y]);
 			printf("\n");
 		}

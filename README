@@ -4,6 +4,7 @@ separate calculations of expected output.
 Tests currently include:
 - Destination coordinates correctness
 - Source coordinates correctness
+- Transformed (FilterNearest) source coordinates correctness.
 - Composite with and without mask (with/without component alpha), with 1x1
   repeating Pictures and 10x10 Pictures.
 

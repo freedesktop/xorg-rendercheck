@@ -1,4 +1,4 @@
-- Check filtering
+- Check bilinear filtering
 - Check repeating transformed sources
 - Check coordinates for more different transformations
 - Get a useful number being produced for error values, and correct eval_diff's

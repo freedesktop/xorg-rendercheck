@@ -1,2 +1,10 @@
-9 May 2004:
-First release of renderext.
+2004-09-19:
+	Version 1.0.2 released.
+	Adds a transformed coordinates test.
+
+2004-05-17:
+	Version 1.0.1 released.
+	Makes the fill test useful and adds a destination coordinates test.
+
+2004-05-10:
+	Initial version 1.0 imported.
