@@ -110,7 +110,6 @@ int main(int argc, char **argv)
 	int i, maj, min;
 	XWindowAttributes a;
 	picture_info window;
-	char window_desc[20];
 
 	dpy = XOpenDisplay(0);
 
@@ -137,11 +136,15 @@ int main(int argc, char **argv)
 	window.format = XRenderFindVisualFormat(dpy, a.visual);
 	window.pict = XRenderCreatePicture(dpy, window.d,
 	    window.format, 0, 0);
+	window.name = (char *)malloc(20);
+	if (window.name == NULL)
+		errx(1, "malloc error");
+	describe_format(window.name, 20, window.format);
+	printf("Window format: %s\n", window.name);
+	strncat(window.name, " window", 20);
 	XSelectInput(dpy, window.d, ExposureMask);
 	XMapWindow(dpy, window.d);
 
-	describe_format(window_desc, 20, window.format);
-	printf("Window format: %s\n", window_desc);
 
 	/* We have to premultiply the alpha into the r, g, b values of the
 	 * sample colors.  Render colors are premultiplied with alpha, so r,g,b

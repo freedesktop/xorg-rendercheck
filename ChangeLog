@@ -1,3 +1,10 @@
+2004-06-13  Eric Anholt  <anholt@FreeBSD.org>
+
+	* main.c: (main):
+	* tests.c: (blend_test), (composite_test), (begin_test):
+	Exercise XAA's Composite acceleration by also rendering
+	directly to the destination window instead of only pixmaps.
+
 2004-05-16  Eric Anholt  <anholt@FreeBSD.org>
 
 	* TODO:

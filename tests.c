@@ -318,8 +318,9 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	}
 	get_pixel(dpy, dst, 0, 0, &tested);
 	/* Copy the output to the window, so the user sees something visual. */
-	XRenderComposite(dpy, PictOpSrc, dst->pict, 0, win->pict, 0, 0, 0, 0,
-	    0, 0, win_width, win_height);
+	if (win != dst)
+		XRenderComposite(dpy, PictOpSrc, dst->pict, 0, win->pict, 0, 0,
+		    0, 0, 0, 0, win_width, win_height);
 
 	tdst = dst_color->color;
 	color_correct(dst, &tdst);
@@ -364,8 +365,9 @@ composite_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	    dst->pict, 0, 0, 0, 0, 0, 0, win_width, win_height);
 	get_pixel(dpy, dst, 0, 0, &tested);
 	/* Copy the output to the window, so the user sees something visual. */
-	XRenderComposite(dpy, PictOpSrc, dst->pict, 0, win->pict, 0, 0, 0, 0,
-	    0, 0, win_width, win_height);
+	if (win != dst)
+		XRenderComposite(dpy, PictOpSrc, dst->pict, 0, win->pict, 0, 0,
+		    0, 0, 0, 0, win_width, win_height);
 	if (componentAlpha) {
 		pa.component_alpha = FALSE;
 		XRenderChangePicture(dpy, mask_color->pict, CPComponentAlpha,
@@ -588,14 +590,21 @@ begin_test(Display *dpy, picture_info *win)
 	srccoords_test(dpy, win, &picture_target, &pictures_1x1[0], TRUE);
 
 	for (i = 0; i < num_ops; i++) {
-	    for (j = 0; j < num_dests; j++) {
+	    for (j = 0; j <= num_dests; j++) {
+		picture_info *pi;
+
+		if (j != num_dests)
+			pi = &dests[j];
+		else
+			pi = win;
 		printf("Beginning %s blend test on %s\n", ops[i].name,
-		    dests[j].name);
+		    pi->name);
+
 		for (src = 0; src < num_colors * num_formats; src++) {
 			for (dst = 0; dst < num_colors; dst++) {
-				blend_test(dpy, win, &dests[j], i,
+				blend_test(dpy, win, pi, i,
 				    &pictures_1x1[src], &pictures_1x1[dst]);
-				blend_test(dpy, win, &dests[j], i,
+				blend_test(dpy, win, pi, i,
 				    &pictures_10x10[src], &pictures_1x1[dst]);
 			}
 		}
@@ -603,22 +612,29 @@ begin_test(Display *dpy, picture_info *win)
 	}
 
 	for (i = 0; i < num_ops; i++) {
-	    for (j = 0; j < num_dests; j++) {
+	    for (j = 0; j <= num_dests; j++) {
+		picture_info *pi;
+
+		if (j != num_dests)
+			pi = &dests[j];
+		else
+			pi = win;
 		printf("Beginning %s composite mask test on %s\n", ops[i].name,
-		    dests[j].name);
+		    pi->name);
+
 		for (src = 0; src < num_colors; src++) {
 		    for (mask = 0; mask < num_colors; mask++) {
 			for (dst = 0; dst < num_colors; dst++) {
-				composite_test(dpy, win, &dests[j], i,
+				composite_test(dpy, win, pi, i,
 				    &pictures_10x10[src], &pictures_10x10[mask],
 				    &pictures_1x1[dst], FALSE, TRUE);
-				composite_test(dpy, win, &dests[j], i,
+				composite_test(dpy, win, pi, i,
 				    &pictures_1x1[src], &pictures_10x10[mask],
 				    &pictures_1x1[dst], FALSE, TRUE);
-				composite_test(dpy, win, &dests[j], i,
+				composite_test(dpy, win, pi, i,
 				    &pictures_10x10[src], &pictures_1x1[mask],
 				    &pictures_1x1[dst], FALSE, TRUE);
-				composite_test(dpy, win, &dests[j], i,
+				composite_test(dpy, win, pi, i,
 				    &pictures_1x1[src], &pictures_1x1[mask],
 				    &pictures_1x1[dst], FALSE, TRUE);
 			}
@@ -628,13 +644,29 @@ begin_test(Display *dpy, picture_info *win)
 	}
 
 	for (i = 0; i < num_ops; i++) {
-	    for (j = 0; j < num_dests; j++) {
+	    for (j = 0; j <= num_dests; j++) {
+		picture_info *pi;
+
+		if (j != num_dests)
+			pi = &dests[j];
+		else
+			pi = win;
 		printf("Beginning %s composite CA mask test on %s\n",
-		    ops[i].name, dests[j].name);
+		    ops[i].name, pi->name);
+
 		for (src = 0; src < num_colors; src++) {
 		    for (mask = 0; mask < num_colors; mask++) {
 			for (dst = 0; dst < num_colors; dst++) {
-				composite_test(dpy, win, &dests[j], i,
+				composite_test(dpy, win, pi, i,
+				    &pictures_10x10[src], &pictures_10x10[mask],
+				    &pictures_1x1[dst], TRUE, TRUE);
+				composite_test(dpy, win, pi, i,
+				    &pictures_1x1[src], &pictures_10x10[mask],
+				    &pictures_1x1[dst], TRUE, TRUE);
+				composite_test(dpy, win, pi, i,
+				    &pictures_10x10[src], &pictures_1x1[mask],
+				    &pictures_1x1[dst], TRUE, TRUE);
+				composite_test(dpy, win, pi, i,
 				    &pictures_1x1[src], &pictures_1x1[mask],
 				    &pictures_1x1[dst], TRUE, TRUE);
 			}
