@@ -45,7 +45,36 @@ typedef struct _picture_info {
 	color4d color;		/* If a 1x1R pict, the (corrected) color.*/
 } picture_info;
 
+struct op_info {
+	int op;
+	char *name;
+};
+
+extern int pixmap_move_iter;
+extern int win_width, win_height;
+extern struct op_info ops[];
+extern Bool is_verbose;
+extern color4d colors[];
+
+/* main.c */
+void
+describe_format(char *desc, int len, XRenderPictFormat *format);
+
 /* tests.c */
+void
+color_correct(picture_info *pi, color4d *color);
+
+void
+get_pixel(Display *dpy, picture_info *pi, int x, int y, color4d *color);
+
+int
+eval_diff(char *name, color4d *expected, color4d *test, int x, int y,
+    Bool verbose);
+
+void
+argb_fill(Display *dpy, picture_info *p, int x, int y, int w, int h, float a,
+    float r, float g, float b);
+
 void
 begin_test(Display *dpy, picture_info *win);
 
@@ -53,3 +82,29 @@ begin_test(Display *dpy, picture_info *win);
 void
 do_composite(int op, color4d *src, color4d *mask, color4d *dst, color4d *result,
     Bool componentAlpha);
+
+/* The tests */
+Bool
+blend_test(Display *dpy, picture_info *win, picture_info *dst, int op,
+    picture_info *src_color, picture_info *dst_color);
+
+Bool
+composite_test(Display *dpy, picture_info *win, picture_info *dst, int op,
+    picture_info *src_color, picture_info *mask_color, picture_info *dst_color,
+    Bool componentAlpha, Bool print_errors);
+
+Bool
+dstcoords_test(Display *dpy, picture_info *win, picture_info *dst,
+    picture_info *bg, picture_info *fg);
+
+Bool
+fill_test(Display *dpy, picture_info *win, picture_info *src);
+
+Bool
+srccoords_test(Display *dpy, picture_info *win, picture_info *white,
+    Bool test_mask);
+
+Bool
+trans_coords_test(Display *dpy, picture_info *win, picture_info *white,
+    Bool test_mask);
+

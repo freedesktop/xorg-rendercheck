@@ -34,6 +34,8 @@ then
 	RC_LIBS="$X_LIBS -lXrender -lXext -lX11"
 fi
 
+RC_CFLAGS="-Wall $RC_CFLAGS"
+
 AC_SUBST(RC_CFLAGS)
 AC_SUBST(RC_LIBS)
 

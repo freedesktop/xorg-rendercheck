@@ -5,9 +5,15 @@ rendercheck_SOURCES = \
 	main.c \
 	ops.c \
 	rendercheck.h \
-	tests.c
+	tests.c \
+	t_blend.c \
+	t_composite.c \
+	t_dstcoords.c \
+	t_fill.c \
+	t_srccoords.c \
+	t_tsrccoords.c
 
-rendercheck_CFLAGS = $(RC_CFLAGS)
+INCLUDES = $(RC_CFLAGS)
 rendercheck_LDADD = $(RC_LIBS)
 
 EXTRA_DIST = \

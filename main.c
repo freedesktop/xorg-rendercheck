@@ -31,7 +31,6 @@
 
 extern int num_ops;
 extern int num_colors;
-extern color4d colors[];
 
 int is_verbose = FALSE;
 

@@ -22,6 +22,8 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <stdlib.h>
+
 #include "rendercheck.h"
 
 #define mult_chan(src, dst, Fa, Fb) \

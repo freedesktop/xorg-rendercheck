@@ -7,3 +7,4 @@
 - Command line args for what tests, move iter, etc.
 - Check repeating of sources with various sizes.
 - Check trapezoids!
+- get_pixel equivalent that doesn't involve round-trips per call.
