@@ -10,8 +10,6 @@ AC_INIT([rendercheck],
 AC_CONFIG_SRCDIR([Makefile.am])
 AM_INIT_AUTOMAKE([dist-bzip2])
 
-AC_CONFIG_AUX_DIR(.)
-
 AM_MAINTAINER_MODE
 
 # Checks for programs.
