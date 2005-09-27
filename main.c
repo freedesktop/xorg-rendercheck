@@ -108,7 +108,8 @@ describe_format(char *desc, int len, XRenderPictFormat *format)
 static void
 usage (char *program)
 {
-    fprintf(stderr, "usage: %s [-d display] [-v] [-t test1,test2,...]\n",
+    fprintf(stderr, "usage: %s [-d|--display display] [-v|--verbose]\n"
+	"\t[-t test1,test2,...] [--sync]\n",
 	program);
     exit(1);
 }
@@ -118,13 +119,23 @@ int main(int argc, char **argv)
 	Display *dpy;
 	XEvent ev;
 	int i, o, maj, min;
+	static int is_sync = 0;
 	XWindowAttributes a;
 	XSetWindowAttributes as;
 	picture_info window;
 	char *display = NULL;
 	char *test, *nextname;
 
-	while ((o = getopt (argc, argv, "d:i:t:v")) != -1) {
+	static struct option longopts[] = {
+		{ "display",	required_argument,	NULL,	'd' },
+		{ "iterations",	required_argument,	NULL,	'i' },
+		{ "tests",	required_argument,	NULL,	't' },
+		{ "verbose",	no_argument,		NULL,	'v' },
+		{ "sync",	no_argument,		&is_sync, 1},
+		{ NULL,		0,			NULL,	0 }
+	};
+
+	while ((o = getopt_long(argc, argv, "d:i:t:v", longopts, NULL)) != -1) {
 		switch (o) {
 		case 'd':
 			display = optarg;
@@ -166,6 +177,8 @@ int main(int argc, char **argv)
 		case 'v':
 			is_verbose = TRUE;
 			break;
+		case 0:
+			break;
 		default:
 			usage(argv[0]);
 			break;
@@ -175,6 +188,8 @@ int main(int argc, char **argv)
 	dpy = XOpenDisplay(display);
 	if (dpy == NULL)
 		errx(1, "Couldn't open display.");
+	if (is_sync)
+		XSynchronize(dpy, 1);
 
 	if (!XRenderQueryExtension(dpy, &i, &i))
 		errx(1, "Render extension missing.");
