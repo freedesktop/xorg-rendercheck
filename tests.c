@@ -194,7 +194,7 @@ begin_test(Display *dpy, picture_info *win)
 {
 	int i, j, src, dst, mask;
 	int num_dests, num_formats;
-	picture_info *dests, *pictures_1x1, *pictures_10x10, picture_3x3;
+	picture_info *dests, *pictures_1x1, *pictures_10x10, picture_3x3, *pictures_solid;
 
 	num_dests = 3;
 	dests = (picture_info *)malloc(num_dests * sizeof(dests[0]));
@@ -302,6 +302,18 @@ begin_test(Display *dpy, picture_info *win)
 		argb_fill(dpy, &picture_3x3, x, y, 1, 1, c->a, c->r, c->g, c->b);
 	}
 
+        pictures_solid = malloc(num_colors * sizeof(picture_info));
+	for (i = 0; i < num_colors; i++) {
+            pictures_solid[i].color = colors[i];
+            XRenderColor c;
+            c.alpha = (int)(colors[i].a*65535);
+            c.red = (int)(colors[i].r*65535);
+            c.green = (int)(colors[i].g*65535);
+            c.blue = (int)(colors[i].b*65535);
+            pictures_solid[i].pict = XRenderCreateSolidFill(dpy, &c);
+            pictures_solid[i].name = "Solid";
+        }
+
 	if (enabled_tests & TEST_FILL) {
 		printf("Beginning testing of filling of 1x1R pictures\n");
 		for (i = 0; i < num_colors * num_formats; i++) {
@@ -345,14 +357,14 @@ begin_test(Display *dpy, picture_info *win)
 		for (i = 0; i < num_ops; i++) {
 		    for (j = 0; j <= num_dests; j++) {
 			picture_info *pi;
-	
+
 			if (j != num_dests)
 				pi = &dests[j];
 			else
 				pi = win;
 			printf("Beginning %s blend test on %s\n", ops[i].name,
 			    pi->name);
-	
+
 			for (src = 0; src < num_colors * num_formats; src++) {
 				for (dst = 0; dst < num_colors; dst++) {
 					blend_test(dpy, win, pi, i,
@@ -363,6 +375,11 @@ begin_test(Display *dpy, picture_info *win)
 					    &pictures_1x1[dst]);
 				}
 			}
+                        for (src = 0; src < num_colors; src++) {
+                            for (dst = 0; dst < num_colors; dst++) {
+                                blend_test(dpy, win, pi, i, &pictures_solid[src], &pictures_1x1[dst]);
+                            }
+                        }
 		    }
 		}
 	}
@@ -371,14 +388,14 @@ begin_test(Display *dpy, picture_info *win)
 		for (i = 0; i < num_ops; i++) {
 		    for (j = 0; j <= num_dests; j++) {
 			picture_info *pi;
-	
+
 			if (j != num_dests)
 				pi = &dests[j];
 			else
 				pi = win;
 			printf("Beginning %s composite mask test on %s\n",
 			    ops[i].name, pi->name);
-	
+
 			for (src = 0; src < num_colors; src++) {
 			    for (mask = 0; mask < num_colors; mask++) {
 				for (dst = 0; dst < num_colors; dst++) {
@@ -409,14 +426,14 @@ begin_test(Display *dpy, picture_info *win)
 		for (i = 0; i < num_ops; i++) {
 		    for (j = 0; j <= num_dests; j++) {
 			picture_info *pi;
-	
+
 			if (j != num_dests)
 				pi = &dests[j];
 			else
 				pi = win;
 			printf("Beginning %s composite CA mask test on %s\n",
 			    ops[i].name, pi->name);
-	
+
 			for (src = 0; src < num_colors; src++) {
 			    for (mask = 0; mask < num_colors; mask++) {
 				for (dst = 0; dst < num_colors; dst++) {
