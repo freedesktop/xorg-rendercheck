@@ -104,12 +104,13 @@ describe_format(char *desc, int len, XRenderPictFormat *format)
 	}
 }
 
-
 static void
 usage (char *program)
 {
     fprintf(stderr, "usage: %s [-d|--display display] [-v|--verbose]\n"
-	"\t[-t test1,test2,...] [--sync]\n",
+	"\t[-t test1,test2,...] [--sync]\n"
+            "\tAvailable tests: dcoors,scoords,mcoords,tscoords,\n"
+            "\t\ttmcoords,blend,composite,cacomposite,gradients\n",
 	program);
     exit(1);
 }
@@ -168,11 +169,13 @@ int main(int argc, char **argv)
 					enabled_tests |= TEST_COMPOSITE;
 				} else if (strcmp(test, "cacomposite") == 0) {
 					enabled_tests |= TEST_CACOMPOSITE;
+				} else if (strcmp(test, "gradients") == 0) {
+					enabled_tests |= TEST_GRADIENTS;
 				} else {
 					usage(argv[0]);
 				}
 			}
-			
+
 			break;
 		case 'v':
 			is_verbose = TRUE;
@@ -243,5 +246,7 @@ int main(int argc, char **argv)
 			exit(0);
 		}
 	}
+
+        XCloseDisplay(dpy);
 	return 0;
 }

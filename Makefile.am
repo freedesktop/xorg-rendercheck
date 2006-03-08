@@ -11,7 +11,8 @@ rendercheck_SOURCES = \
 	t_dstcoords.c \
 	t_fill.c \
 	t_srccoords.c \
-	t_tsrccoords.c
+	t_tsrccoords.c \
+	t_gradient.c
 
 INCLUDES = $(RC_CFLAGS)
 rendercheck_LDADD = $(RC_LIBS)

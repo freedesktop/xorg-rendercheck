@@ -192,7 +192,7 @@ argb_fill(Display *dpy, picture_info *p, int x, int y, int w, int h, float a,
 void
 begin_test(Display *dpy, picture_info *win)
 {
-	int i, j, src, dst, mask;
+	int i, j, src, dst = 0, mask;
 	int num_dests, num_formats;
 	picture_info *dests, *pictures_1x1, *pictures_10x10, picture_3x3, *pictures_solid;
 
@@ -459,4 +459,25 @@ begin_test(Display *dpy, picture_info *win)
 		    }
 		}
 	}
+
+        if (enabled_tests & TEST_GRADIENTS) {
+            for (i = 0; i < num_ops; i++) {
+                for (j = 0; j <= num_dests; j++) {
+                    picture_info *pi;
+                    
+                    if (j != num_dests)
+                        pi = &dests[j];
+                    else
+                        pi = win;
+                    printf("Beginning %s linear gradient test on %s\n",
+                           ops[i].name, pi->name);
+                    
+                    for (src = 0; src < num_colors; src++) {
+                        for (mask = 0; mask < num_colors; mask++) {
+                            linear_gradient_test(dpy, win, pi, i, &pictures_1x1[dst]);
+                        }
+                    }
+                }
+            }
+        }
 }
