@@ -10,9 +10,10 @@ rendercheck_SOURCES = \
 	t_composite.c \
 	t_dstcoords.c \
 	t_fill.c \
+	t_gradient.c \
 	t_srccoords.c \
 	t_tsrccoords.c \
-	t_gradient.c
+	t_triangles.c
 
 INCLUDES = $(RC_CFLAGS)
 rendercheck_LDADD = $(RC_LIBS)

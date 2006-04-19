@@ -480,4 +480,32 @@ begin_test(Display *dpy, picture_info *win)
                 }
             }
         }
+
+	if (enabled_tests & TEST_TRIANGLES) {
+	    for (i = 0; i < num_ops; i++) {
+		for (j = 0; j <= num_dests; j++) {
+			picture_info *pi;
+
+			if (j != num_dests)
+			    pi = &dests[j];
+			else
+			    pi = win;
+
+			printf("Beginning %s Triangles test on %s\n",
+			    ops[i].name, pi->name);
+			triangles_test(dpy, win, pi, i, &pictures_1x1[num_formats],
+			    &pictures_1x1[0]);
+
+			printf("Beginning %s TriStrip test on %s\n",
+			    ops[i].name, pi->name);
+			tristrip_test(dpy, win, pi, i, &pictures_1x1[num_formats],
+			    &pictures_1x1[0]);
+
+			printf("Beginning %s TriFan test on %s\n",
+			    ops[i].name, pi->name);
+			trifan_test(dpy, win, pi, i, &pictures_1x1[num_formats],
+			    &pictures_1x1[0]);
+		}
+	    }
+	}
 }
