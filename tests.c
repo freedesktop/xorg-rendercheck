@@ -133,6 +133,7 @@ get_pixel(Display *dpy, picture_info *pi, int x, int y, color4d *color)
 		color->g = 0.0;
 		color->b = 0.0;
 	}
+	XDestroyImage(image);
 }
 
 int
