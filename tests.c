@@ -260,10 +260,10 @@ begin_test(Display *dpy, picture_info *win)
 		pictures_1x1[i].color = *c;
 		color_correct(&pictures_1x1[i], &pictures_1x1[i].color);
 	}
-	argb32white = &pictures_1x1[0];
-	argb32red = &pictures_1x1[1];
-	argb32green = &pictures_1x1[2];
-	argb32blue = &pictures_1x1[3];
+	argb32white = &pictures_1x1[0 * num_formats];
+	argb32red = &pictures_1x1[1 * num_formats];
+	argb32green = &pictures_1x1[2 * num_formats];
+	argb32blue = &pictures_1x1[3 * num_formats];
 
 	pictures_10x10 = (picture_info *)malloc(num_colors * num_formats *
 	    sizeof(picture_info));
