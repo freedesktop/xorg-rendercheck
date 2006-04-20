@@ -28,6 +28,9 @@
 
 #include "rendercheck.h"
 
+/* Note: changing the order of these colors may disrupt tests that depend on
+ * specific colors.  Just add to the end if you need.
+ */
 color4d colors[] = {
 	{1.0, 1.0, 1.0, 1.0},
 	{1.0, 0, 0, 1.0},
@@ -38,6 +41,9 @@ color4d colors[] = {
 	{0.0, .5, 1.0, .5},
 	{0.0, .5, 1.0, 0}
 };
+
+/* Convenience pointers to 1x1 repeating colors */
+picture_info *argb32white, *argb32red, *argb32green, *argb32blue;
 
 int num_colors = sizeof(colors) / sizeof(colors[0]);
 
@@ -254,6 +260,10 @@ begin_test(Display *dpy, picture_info *win)
 		pictures_1x1[i].color = *c;
 		color_correct(&pictures_1x1[i], &pictures_1x1[i].color);
 	}
+	argb32white = &pictures_1x1[0];
+	argb32red = &pictures_1x1[1];
+	argb32green = &pictures_1x1[2];
+	argb32blue = &pictures_1x1[3];
 
 	pictures_10x10 = (picture_info *)malloc(num_colors * num_formats *
 	    sizeof(picture_info));
@@ -476,6 +486,34 @@ begin_test(Display *dpy, picture_info *win)
                             linear_gradient_test(dpy, win, pi, i, &pictures_1x1[dst]);
                         }
                     }
+                }
+            }
+        }
+
+        if (enabled_tests & TEST_REPEAT) {
+            for (i = 0; i < num_ops; i++) {
+                for (j = 0; j <= num_dests; j++) {
+                    picture_info *pi;
+                    
+                    if (j != num_dests)
+                        pi = &dests[j];
+                    else
+                        pi = win;
+                    printf("Beginning %s src repeat test on %s\n",
+                           ops[i].name, pi->name);
+		    /* Test with white dest, and generated repeating src
+		     * consisting of colors 1 and 2 (r, g).
+		     */
+		    repeat_test(dpy, win, pi, i, argb32white, argb32red,
+		        argb32green, FALSE);
+
+                    printf("Beginning %s mask repeat test on %s\n",
+                           ops[i].name, pi->name);
+		    /* Test with white dest, translucent red src, and generated
+		     * repeating mask consisting of colors 1 and 2 (r, g).
+		     */
+		    repeat_test(dpy, win, pi, i, argb32white, argb32red,
+		        argb32green, TRUE);
                 }
             }
         }

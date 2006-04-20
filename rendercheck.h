@@ -58,6 +58,7 @@ struct op_info {
 #define TEST_COMPOSITE		0x0080
 #define TEST_CACOMPOSITE	0x0100
 #define TEST_GRADIENTS  	0x0200
+#define TEST_REPEAT	  	0x0400
 
 extern int pixmap_move_iter;
 extern int win_width, win_height;
@@ -65,6 +66,7 @@ extern struct op_info ops[];
 extern Bool is_verbose;
 extern color4d colors[];
 extern int enabled_tests;
+extern picture_info *argb32white, *argb32red, *argb32green, *argb32blue;
 
 /* main.c */
 void
@@ -120,3 +122,8 @@ trans_coords_test(Display *dpy, picture_info *win, picture_info *white,
 
 Bool linear_gradient_test(Display *dpy, picture_info *win,
                           picture_info *dst, int op, picture_info *dst_color);
+
+Bool
+repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
+    picture_info *dst_color, picture_info *c1, picture_info *c2,
+    Bool test_mask);
