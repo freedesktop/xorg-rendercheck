@@ -32,7 +32,9 @@ then
 	RC_LIBS="$X_LIBS -lXrender -lXext -lX11"
 fi
 
-RC_CFLAGS="-Wall $RC_CFLAGS"
+if  test "x$GCC" = xyes ; then
+    RC_CFLAGS="-Wall $RC_CFLAGS"
+fi
 
 AC_SUBST(RC_CFLAGS)
 AC_SUBST(RC_LIBS)
