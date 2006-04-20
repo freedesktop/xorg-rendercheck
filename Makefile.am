@@ -23,6 +23,7 @@ EXTRA_DIST = \
 	COPYING \
 	INSTALL \
 	README \
-	TODO \
+	doc/AddingNewTests \
+	doc/TODO \
 	autogen.sh \
 	${man_MANS}
