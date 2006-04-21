@@ -1,6 +1,4 @@
 /*
- * $Id$
- *
  * Copyright © 2005 Eric Anholt
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
@@ -38,16 +36,20 @@ composite_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	char testname[40];
 	XRenderPictureAttributes pa;
 	Bool success = TRUE;
+	int i;
 
 	if (componentAlpha) {
 		pa.component_alpha = TRUE;
 		XRenderChangePicture(dpy, mask_color->pict, CPComponentAlpha,
 		    &pa);
 	}
-	XRenderComposite(dpy, PictOpSrc, dst_color->pict, 0, dst->pict, 0, 0,
-	    0, 0, 0, 0, win_width, win_height);
-	XRenderComposite(dpy, ops[op].op, src_color->pict, mask_color->pict,
-	    dst->pict, 0, 0, 0, 0, 0, 0, win_width, win_height);
+	for (i = 0; i < pixmap_move_iter; i++) {
+		XRenderComposite(dpy, PictOpSrc, dst_color->pict, 0, dst->pict,
+		    0, 0, 0, 0, 0, 0, win_width, win_height);
+		XRenderComposite(dpy, ops[op].op, src_color->pict,
+		    mask_color->pict, dst->pict, 0, 0, 0, 0, 0, 0,
+		    win_width, win_height);
+	}
 	get_pixel(dpy, dst, 0, 0, &tested);
 	/* Copy the output to the window, so the user sees something visual. */
 	if (win != dst)
