@@ -242,8 +242,10 @@ int main(int argc, char **argv)
 
 	while (XNextEvent(dpy, &ev) == 0) {
 		if (ev.type == Expose && !ev.xexpose.count) {
-			begin_test(dpy, &window);
-			exit(0);
+			if (do_tests(dpy, &window))
+				exit(0);
+			else
+				exit(1);
 		}
 	}
 

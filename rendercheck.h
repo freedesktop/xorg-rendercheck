@@ -87,8 +87,8 @@ void
 argb_fill(Display *dpy, picture_info *p, int x, int y, int w, int h, float a,
     float r, float g, float b);
 
-void
-begin_test(Display *dpy, picture_info *win);
+Bool
+do_tests(Display *dpy, picture_info *win);
 
 /* ops.c */
 void
