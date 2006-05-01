@@ -1,6 +1,4 @@
 /*
- * $Id$
- *
  * Copyright © 2005 Eric Anholt
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
@@ -35,13 +33,15 @@ dstcoords_test(Display *dpy, picture_info *win, picture_info *dst,
     picture_info *bg, picture_info *fg)
 {
 	color4d expected, tested;
-	int x, y;
+	int x, y, i;
 	Bool failed = FALSE;
 
-	XRenderComposite(dpy, PictOpSrc, bg->pict, 0, dst->pict, 0, 0, 0, 0,
-	    0, 0, win_width, win_height);
-	XRenderComposite(dpy, PictOpSrc, fg->pict, 0, dst->pict, 0, 0, 0, 0,
-	    1, 1, 1, 1);
+	for (i = 0; i < pixmap_move_iter; i++) {
+		XRenderComposite(dpy, PictOpSrc, bg->pict, 0, dst->pict, 0, 0,
+		    0, 0, 0, 0, win_width, win_height);
+		XRenderComposite(dpy, PictOpSrc, fg->pict, 0, dst->pict, 0, 0,
+		    0, 0, 1, 1, 1, 1);
+	}
 	/* Copy the output to the window, so the user sees something visual. */
 	XRenderComposite(dpy, PictOpSrc, dst->pict, 0, win->pict, 0, 0, 0, 0,
 	    0, 0, win_width, win_height);

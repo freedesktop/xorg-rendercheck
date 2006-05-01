@@ -1,6 +1,4 @@
 /*
- * $Id$
- *
  * Copyright © 2004 Eric Anholt
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
@@ -30,6 +28,9 @@
 
 #include "rendercheck.h"
 
+/* Note: changing the order of these colors may disrupt tests that depend on
+ * specific colors.  Just add to the end if you need.
+ */
 color4d colors[] = {
 	{1.0, 1.0, 1.0, 1.0},
 	{1.0, 0, 0, 1.0},
@@ -40,6 +41,9 @@ color4d colors[] = {
 	{0.0, .5, 1.0, .5},
 	{0.0, .5, 1.0, 0}
 };
+
+/* Convenience pointers to 1x1 repeating colors */
+picture_info *argb32white, *argb32red, *argb32green, *argb32blue;
 
 int num_colors = sizeof(colors) / sizeof(colors[0]);
 
@@ -135,6 +139,7 @@ get_pixel(Display *dpy, picture_info *pi, int x, int y, color4d *color)
 		color->g = 0.0;
 		color->b = 0.0;
 	}
+	XDestroyImage(image);
 }
 
 int
@@ -189,12 +194,13 @@ argb_fill(Display *dpy, picture_info *p, int x, int y, int w, int h, float a,
 	XRenderFillRectangle(dpy, PictOpSrc, p->pict, &rendercolor, x, y, w, h);
 }
 
-void
-begin_test(Display *dpy, picture_info *win)
+Bool
+do_tests(Display *dpy, picture_info *win)
 {
 	int i, j, src, dst = 0, mask;
 	int num_dests, num_formats;
 	picture_info *dests, *pictures_1x1, *pictures_10x10, picture_3x3, *pictures_solid;
+	int success_mask = 0, tests_passed = 0, tests_total = 0;
 
 	num_dests = 3;
 	dests = (picture_info *)malloc(num_dests * sizeof(dests[0]));
@@ -255,6 +261,10 @@ begin_test(Display *dpy, picture_info *win)
 		pictures_1x1[i].color = *c;
 		color_correct(&pictures_1x1[i], &pictures_1x1[i].color);
 	}
+	argb32white = &pictures_1x1[0 * num_formats];
+	argb32red = &pictures_1x1[1 * num_formats];
+	argb32green = &pictures_1x1[2 * num_formats];
+	argb32blue = &pictures_1x1[3 * num_formats];
 
 	pictures_10x10 = (picture_info *)malloc(num_colors * num_formats *
 	    sizeof(picture_info));
@@ -314,46 +324,87 @@ begin_test(Display *dpy, picture_info *win)
             pictures_solid[i].name = "Solid";
         }
 
+#define RECORD_RESULTS()					\
+do {								\
+	group_ok = group_ok && ok;				\
+	if (ok)							\
+		tests_passed++;					\
+	tests_total++;						\
+} while (0)
+
 	if (enabled_tests & TEST_FILL) {
+		Bool ok, group_ok = TRUE;
+
 		printf("Beginning testing of filling of 1x1R pictures\n");
 		for (i = 0; i < num_colors * num_formats; i++) {
-			fill_test(dpy, win, &pictures_1x1[i]);
+			ok = fill_test(dpy, win, &pictures_1x1[i]);
+			RECORD_RESULTS();
 		}
 
 		printf("Beginning testing of filling of 10x10 pictures\n");
 		for (i = 0; i < num_colors * num_formats; i++) {
-			fill_test(dpy, win, &pictures_10x10[i]);
+			ok = fill_test(dpy, win, &pictures_10x10[i]);
+			RECORD_RESULTS();
 		}
+		if (group_ok)
+			success_mask |= TEST_FILL;
 	}
 
 	if (enabled_tests & TEST_DSTCOORDS) {
+		Bool ok, group_ok = TRUE;
+
 		printf("Beginning dest coords test\n");
 		/* 0 and num_formats should result in ARGB8888 red on ARGB8888 white. */
-		dstcoords_test(dpy, win, &dests[0], &pictures_1x1[0],
+		ok = dstcoords_test(dpy, win, &dests[0], &pictures_1x1[0],
 		    &pictures_1x1[num_formats]);
+		RECORD_RESULTS();
+		if (group_ok)
+			success_mask |= TEST_DSTCOORDS;
 	}
 
 	if (enabled_tests & TEST_SRCCOORDS) {
+		Bool ok, group_ok = TRUE;
+
 		printf("Beginning src coords test\n");
-		srccoords_test(dpy, win, &pictures_1x1[0], FALSE);
+		ok = srccoords_test(dpy, win, &pictures_1x1[0], FALSE);
+		RECORD_RESULTS();
+		if (group_ok)
+			success_mask |= TEST_SRCCOORDS;
 	}
 
 	if (enabled_tests & TEST_MASKCOORDS) {
+		Bool ok, group_ok = TRUE;
+
 		printf("Beginning mask coords test\n");
-		srccoords_test(dpy, win, &pictures_1x1[0], TRUE);
+		ok = srccoords_test(dpy, win, &pictures_1x1[0], TRUE);
+		RECORD_RESULTS();
+		if (group_ok)
+			success_mask |= TEST_MASKCOORDS;
 	}
 
 	if (enabled_tests & TEST_TSRCCOORDS) {
+		Bool ok, group_ok = TRUE;
+
 		printf("Beginning transformed src coords test\n");
-		trans_coords_test(dpy, win, &pictures_1x1[0], FALSE);
+		ok = trans_coords_test(dpy, win, &pictures_1x1[0], FALSE);
+		RECORD_RESULTS();
+		if (group_ok)
+			success_mask |= TEST_TSRCCOORDS;
 	}
 
 	if (enabled_tests & TEST_TMASKCOORDS) {
+		Bool ok, group_ok = TRUE;
+
 		printf("Beginning transformed mask coords test\n");
-		trans_coords_test(dpy, win, &pictures_1x1[0], TRUE);
+		ok = trans_coords_test(dpy, win, &pictures_1x1[0], TRUE);
+		RECORD_RESULTS();
+		if (group_ok)
+			success_mask |= TEST_TMASKCOORDS;
 	}
 
 	if (enabled_tests & TEST_BLEND) {
+		Bool ok, group_ok = TRUE;
+
 		for (i = 0; i < num_ops; i++) {
 		    for (j = 0; j <= num_dests; j++) {
 			picture_info *pi;
@@ -367,24 +418,31 @@ begin_test(Display *dpy, picture_info *win)
 
 			for (src = 0; src < num_colors * num_formats; src++) {
 				for (dst = 0; dst < num_colors; dst++) {
-					blend_test(dpy, win, pi, i,
+					ok = blend_test(dpy, win, pi, i,
 					    &pictures_1x1[src],
 					    &pictures_1x1[dst]);
-					blend_test(dpy, win, pi, i,
+					RECORD_RESULTS();
+					ok = blend_test(dpy, win, pi, i,
 					    &pictures_10x10[src],
 					    &pictures_1x1[dst]);
+					RECORD_RESULTS();
 				}
 			}
                         for (src = 0; src < num_colors; src++) {
                             for (dst = 0; dst < num_colors; dst++) {
-                                blend_test(dpy, win, pi, i, &pictures_solid[src], &pictures_1x1[dst]);
+                                ok = blend_test(dpy, win, pi, i, &pictures_solid[src], &pictures_1x1[dst]);
+				RECORD_RESULTS();
                             }
                         }
 		    }
 		}
+		if (group_ok)
+			success_mask |= TEST_BLEND;
 	}
 
 	if (enabled_tests & TEST_COMPOSITE) {
+		Bool ok, group_ok = TRUE;
+
 		for (i = 0; i < num_ops; i++) {
 		    for (j = 0; j <= num_dests; j++) {
 			picture_info *pi;
@@ -399,30 +457,38 @@ begin_test(Display *dpy, picture_info *win)
 			for (src = 0; src < num_colors; src++) {
 			    for (mask = 0; mask < num_colors; mask++) {
 				for (dst = 0; dst < num_colors; dst++) {
-					composite_test(dpy, win, pi, i,
+					ok = composite_test(dpy, win, pi, i,
 					    &pictures_10x10[src],
 					    &pictures_10x10[mask],
 					    &pictures_1x1[dst], FALSE, TRUE);
-					composite_test(dpy, win, pi, i,
+					RECORD_RESULTS();
+					ok = composite_test(dpy, win, pi, i,
 					    &pictures_1x1[src],
 					    &pictures_10x10[mask],
 					    &pictures_1x1[dst], FALSE, TRUE);
-					composite_test(dpy, win, pi, i,
+					RECORD_RESULTS();
+					ok = composite_test(dpy, win, pi, i,
 					    &pictures_10x10[src],
 					    &pictures_1x1[mask],
 					    &pictures_1x1[dst], FALSE, TRUE);
-					composite_test(dpy, win, pi, i,
+					RECORD_RESULTS();
+					ok = composite_test(dpy, win, pi, i,
 					    &pictures_1x1[src],
 					    &pictures_1x1[mask],
 					    &pictures_1x1[dst], FALSE, TRUE);
+					RECORD_RESULTS();
 				}
 			    }
 			}
 		    }
 		}
+		if (group_ok)
+			success_mask |= TEST_COMPOSITE;
 	}
 
 	if (enabled_tests & TEST_CACOMPOSITE) {
+		Bool ok, group_ok = TRUE;
+
 		for (i = 0; i < num_ops; i++) {
 		    for (j = 0; j <= num_dests; j++) {
 			picture_info *pi;
@@ -437,30 +503,38 @@ begin_test(Display *dpy, picture_info *win)
 			for (src = 0; src < num_colors; src++) {
 			    for (mask = 0; mask < num_colors; mask++) {
 				for (dst = 0; dst < num_colors; dst++) {
-					composite_test(dpy, win, pi, i,
+					ok = composite_test(dpy, win, pi, i,
 					    &pictures_10x10[src],
 					    &pictures_10x10[mask],
 					    &pictures_1x1[dst], TRUE, TRUE);
-					composite_test(dpy, win, pi, i,
+					RECORD_RESULTS();
+					ok = composite_test(dpy, win, pi, i,
 					    &pictures_1x1[src],
 					    &pictures_10x10[mask],
 					    &pictures_1x1[dst], TRUE, TRUE);
-					composite_test(dpy, win, pi, i,
+					RECORD_RESULTS();
+					ok = composite_test(dpy, win, pi, i,
 					    &pictures_10x10[src],
 					    &pictures_1x1[mask],
 					    &pictures_1x1[dst], TRUE, TRUE);
-					composite_test(dpy, win, pi, i,
+					RECORD_RESULTS();
+					ok = composite_test(dpy, win, pi, i,
 					    &pictures_1x1[src],
 					    &pictures_1x1[mask],
 					    &pictures_1x1[dst], TRUE, TRUE);
+					RECORD_RESULTS();
 				}
 			    }
 			}
 		    }
 		}
+		if (group_ok)
+			success_mask |= TEST_CACOMPOSITE;
 	}
 
         if (enabled_tests & TEST_GRADIENTS) {
+	    Bool ok, group_ok = TRUE;
+
             for (i = 0; i < num_ops; i++) {
                 for (j = 0; j <= num_dests; j++) {
                     picture_info *pi;
@@ -474,10 +548,52 @@ begin_test(Display *dpy, picture_info *win)
                     
                     for (src = 0; src < num_colors; src++) {
                         for (mask = 0; mask < num_colors; mask++) {
-                            linear_gradient_test(dpy, win, pi, i, &pictures_1x1[dst]);
+                            ok = linear_gradient_test(dpy, win, pi, i,
+				&pictures_1x1[dst]);
+			    RECORD_RESULTS();
                         }
                     }
                 }
             }
+	    if (group_ok)
+		 success_mask |= TEST_GRADIENTS;
         }
+
+        if (enabled_tests & TEST_REPEAT) {
+	    Bool ok, group_ok = TRUE;
+
+            for (i = 0; i < num_ops; i++) {
+                for (j = 0; j <= num_dests; j++) {
+                    picture_info *pi;
+                    
+                    if (j != num_dests)
+                        pi = &dests[j];
+                    else
+                        pi = win;
+                    printf("Beginning %s src repeat test on %s\n",
+                           ops[i].name, pi->name);
+		    /* Test with white dest, and generated repeating src
+		     * consisting of colors 1 and 2 (r, g).
+		     */
+		    ok = repeat_test(dpy, win, pi, i, argb32white, argb32red,
+		        argb32green, FALSE);
+		    RECORD_RESULTS();
+
+                    printf("Beginning %s mask repeat test on %s\n",
+                           ops[i].name, pi->name);
+		    /* Test with white dest, translucent red src, and generated
+		     * repeating mask consisting of colors 1 and 2 (r, g).
+		     */
+		    ok = repeat_test(dpy, win, pi, i, argb32white, argb32red,
+		        argb32green, TRUE);
+		    RECORD_RESULTS();
+                }
+            }
+	    if (group_ok)
+		success_mask |= TEST_REPEAT;
+        }
+
+	printf("%d tests passed of %d total\n", tests_passed, tests_total);
+
+	return tests_passed == tests_total;
 }

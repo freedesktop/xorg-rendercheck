@@ -10,6 +10,7 @@ rendercheck_SOURCES = \
 	t_composite.c \
 	t_dstcoords.c \
 	t_fill.c \
+	t_repeat.c \
 	t_srccoords.c \
 	t_tsrccoords.c \
 	t_gradient.c
@@ -22,6 +23,7 @@ EXTRA_DIST = \
 	COPYING \
 	INSTALL \
 	README \
-	TODO \
+	doc/AddingNewTests \
+	doc/TODO \
 	autogen.sh \
 	${man_MANS}
