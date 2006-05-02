@@ -21,6 +21,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "rendercheck.h"
 
@@ -31,11 +32,14 @@ Bool
 fill_test(Display *dpy, picture_info *win, picture_info *src)
 {
 	color4d tested;
+	char name[20];
 
 	get_pixel(dpy, src, 0, 0, &tested);
 	/* Copy the output to the window, so the user sees something visual. */
 	XRenderComposite(dpy, PictOpSrc, src->pict, 0, win->pict, 0, 0, 0, 0,
 	    0, 0, win_width, win_height);
 
-	return eval_diff("fill", &src->color, &tested, 0, 0, is_verbose);
+	strcpy(name, "fill ");
+	describe_format(name, 20 - strlen(name), src->format);
+	return eval_diff(name, &src->color, &tested, 0, 0, is_verbose);
 }
