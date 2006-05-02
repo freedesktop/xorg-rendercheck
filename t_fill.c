@@ -24,9 +24,9 @@
 
 #include "rendercheck.h"
 
-/* Test that filling from a 1x1 repeating picture works as expected.  This is
+/* Test that filling of the 1x1 repeating pictures worked as expected.  This is
  * pretty basic to most of the tests.
-  */
+ */
 Bool
 fill_test(Display *dpy, picture_info *win, picture_info *src)
 {
