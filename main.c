@@ -73,9 +73,8 @@ describe_format(char *desc, int len, XRenderPictFormat *format)
 		/* There are bits that are not part of A,R,G,B. Mark them with
 		 * an x.
 		 */
-		snprintf(ad, 4, "x%d", format->depth - (format->direct.red +
-		    format->direct.green + format->direct.blue));
-		if (format->direct.red == 0 || format->direct.green == 0)
+		snprintf(ad, 4, "x%d", format->depth - rc - gc - bc);
+		if (format->direct.red == 0 || format->direct.blue == 0)
 			ashift = format->depth;
 		else
 			ashift = 0;
