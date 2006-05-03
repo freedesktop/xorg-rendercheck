@@ -14,4 +14,4 @@ missing
 mkinstalldirs
 rendercheck
 *.o
-
+*~
