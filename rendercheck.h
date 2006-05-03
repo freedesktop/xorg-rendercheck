@@ -59,6 +59,7 @@ struct op_info {
 #define TEST_CACOMPOSITE	0x0100
 #define TEST_GRADIENTS  	0x0200
 #define TEST_REPEAT	  	0x0400
+#define TEST_TRIANGLES  	0x0800
 
 extern int pixmap_move_iter;
 extern int win_width, win_height;
@@ -127,3 +128,19 @@ Bool
 repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     picture_info *dst_color, picture_info *c1, picture_info *c2,
     Bool test_mask);
+
+Bool
+linear_gradient_test(Display *dpy, picture_info *win,
+    picture_info *dst, int op, picture_info *dst_color);
+
+Bool
+triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
+    picture_info *src_color, picture_info *dst_color);
+
+Bool
+tristrip_test(Display *dpy, picture_info *win, picture_info *dst, int op,
+    picture_info *src_color, picture_info *dst_color);
+
+Bool
+trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
+    picture_info *src_color, picture_info *dst_color);

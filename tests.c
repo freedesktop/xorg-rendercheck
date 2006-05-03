@@ -593,6 +593,41 @@ do {								\
 		success_mask |= TEST_REPEAT;
         }
 
+	if (enabled_tests & TEST_TRIANGLES) {
+	    Bool ok, group_ok = TRUE;
+
+	    for (i = 0; i < num_ops; i++) {
+		for (j = 0; j <= num_dests; j++) {
+			picture_info *pi;
+
+			if (j != num_dests)
+			    pi = &dests[j];
+			else
+			    pi = win;
+
+			printf("Beginning %s Triangles test on %s\n",
+			    ops[i].name, pi->name);
+			ok = triangles_test(dpy, win, pi, i,
+			    &pictures_1x1[num_formats], &pictures_1x1[0]);
+			RECORD_RESULTS();
+
+			printf("Beginning %s TriStrip test on %s\n",
+			    ops[i].name, pi->name);
+			ok = tristrip_test(dpy, win, pi, i,
+			    &pictures_1x1[num_formats], &pictures_1x1[0]);
+			RECORD_RESULTS();
+
+			printf("Beginning %s TriFan test on %s\n",
+			    ops[i].name, pi->name);
+			ok = trifan_test(dpy, win, pi, i,
+			    &pictures_1x1[num_formats], &pictures_1x1[0]);
+			RECORD_RESULTS();
+		}
+	    }
+	    if (group_ok)
+		success_mask |= TEST_TRIANGLES;
+	}
+
 	printf("%d tests passed of %d total\n", tests_passed, tests_total);
 
 	return tests_passed == tests_total;

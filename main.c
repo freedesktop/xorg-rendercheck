@@ -107,7 +107,7 @@ usage (char *program)
     fprintf(stderr, "usage: %s [-d|--display display] [-v|--verbose]\n"
 	"\t[-t test1,test2,...] [--sync]\n"
             "\tAvailable tests: dcoors,scoords,mcoords,tscoords,\n"
-            "\t\ttmcoords,blend,composite,cacomposite,gradients,repeat\n",
+            "\t\ttmcoords,blend,composite,cacomposite,gradients,repeat,triangles\n",
 	program);
     exit(1);
 }
@@ -170,6 +170,8 @@ int main(int argc, char **argv)
 					enabled_tests |= TEST_GRADIENTS;
 				} else if (strcmp(test, "repeat") == 0) {
 					enabled_tests |= TEST_REPEAT;
+				} else if (strcmp(test, "triangles") == 0) {
+					enabled_tests |= TEST_TRIANGLES;
 				} else {
 					usage(argv[0]);
 				}
