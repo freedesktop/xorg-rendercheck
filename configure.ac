@@ -43,5 +43,6 @@ AC_SUBST(RC_LIBS)
 
 # Checks for header files.
 AC_HEADER_STDC
+AC_CHECK_HEADERS([err.h])
 
 AC_OUTPUT([Makefile])

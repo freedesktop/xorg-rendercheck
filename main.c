@@ -23,7 +23,6 @@
 #include "rendercheck.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <err.h>
 #include <string.h>
 #include <getopt.h>
 

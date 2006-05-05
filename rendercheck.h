@@ -22,6 +22,24 @@
 
 #include <X11/extensions/Xrender.h>
 
+#if HAVE_ERR_H
+# include <err.h>
+#else
+# include <stdarg.h>
+# include <stdio.h>
+# include <stdlib.h>
+static inline void errx(int eval, const char *fmt, ...) {
+    va_list args;
+
+    va_start(args, fmt);
+    fprintf(stderr, "Fatal Error: ");
+    fprintf(stderr, fmt, args);
+    fprintf(stderr, "\n", args);
+    va_end(args);
+    exit(eval);
+}
+#endif
+
 #define min(a, b) (a < b ? a : b)
 #define max(a, b) (a > b ? a : b)
 
