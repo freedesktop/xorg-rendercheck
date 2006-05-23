@@ -1,6 +1,13 @@
+2006-05-22:
+	Version 1.1 released.
+	Adds tests for triangles, gradients, and repeating sources.
+	Fixes a major memory leak.
+	Allow run-time selection of the set of tests to be run.
+	Add a manpage.
+
 2004-10-24:
 	Version 1.0.3 released.
-	Allows building on systems without xrender.pc
+	Allows building on systems without xrender.pc.
 
 2004-09-19:
 	Version 1.0.2 released.
