@@ -42,9 +42,8 @@ dstcoords_test(Display *dpy, picture_info *win, picture_info *dst,
 		XRenderComposite(dpy, PictOpSrc, fg->pict, 0, dst->pict, 0, 0,
 		    0, 0, 1, 1, 1, 1);
 	}
-	/* Copy the output to the window, so the user sees something visual. */
-	XRenderComposite(dpy, PictOpSrc, dst->pict, 0, win->pict, 0, 0, 0, 0,
-	    0, 0, win_width, win_height);
+
+	copy_pict_to_win(dpy, dst, win);
 
 	for (x = 0; x < 3; x++) {
 		for (y = 0; y < 3; y++) {

@@ -51,10 +51,8 @@ composite_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		    win_width, win_height);
 	}
 	get_pixel(dpy, dst, 0, 0, &tested);
-	/* Copy the output to the window, so the user sees something visual. */
-	if (win != dst)
-		XRenderComposite(dpy, PictOpSrc, dst->pict, 0, win->pict, 0, 0,
-		    0, 0, 0, 0, win_width, win_height);
+	copy_pict_to_win(dpy, dst, win);
+
 	if (componentAlpha) {
 		pa.component_alpha = FALSE;
 		XRenderChangePicture(dpy, mask_color->pict, CPComponentAlpha,

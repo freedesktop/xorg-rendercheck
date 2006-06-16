@@ -63,9 +63,7 @@ triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	XRenderCompositeTriangles(dpy, ops[op].op, src_color->pict, dst->pict,
 	    XRenderFindStandardFormat(dpy, PictStandardA8), 0, 0, triangles, 2);
 
-	/* Copy the output to the window, so the user sees something visual. */
-	XRenderComposite(dpy, PictOpSrc, dst->pict, 0, win->pict, 0, 0, 0, 0,
-	    0, 0, win_width, win_height);	
+	copy_pict_to_win(dpy, dst, win);
 
 	/* Color expected outside of the triangles */
 	tdst = dst_color->color;
@@ -131,9 +129,7 @@ trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	XRenderCompositeTriFan(dpy, ops[op].op, src_color->pict, dst->pict,
 	    XRenderFindStandardFormat(dpy, PictStandardA8), 0, 0, points, 4);
 
-	/* Copy the output to the window, so the user sees something visual. */
-	XRenderComposite(dpy, PictOpSrc, dst->pict, 0, win->pict, 0, 0, 0, 0,
-	    0, 0, win_width, win_height);	
+	copy_pict_to_win(dpy, dst, win);
 
 	/* Color expected outside of the triangles */
 	tdst = dst_color->color;
@@ -199,9 +195,7 @@ tristrip_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	XRenderCompositeTriStrip(dpy, ops[op].op, src_color->pict, dst->pict,
 	    XRenderFindStandardFormat(dpy, PictStandardA8), 0, 0, points, 4);
 
-	/* Copy the output to the window, so the user sees something visual. */
-	XRenderComposite(dpy, PictOpSrc, dst->pict, 0, win->pict, 0, 0, 0, 0,
-	    0, 0, win_width, win_height);	
+	copy_pict_to_win(dpy, dst, win);
 
 	/* Color expected outside of the triangles */
 	tdst = dst_color->color;

@@ -5,7 +5,7 @@ rendercheck \- simple tests of the X Render extension.
 .SH SYNOPSIS
 .nf
 .B rendercheck [\-d|\-\-display display] [\-i|\-\-iter] [\-\-sync] \
-[\-t|\-\-tests test1,test2,test3,...] [\-v|\-\-verbose]
+[\-t|\-\-tests test1,test2,test3,...] [\-v|\-\-verbose] [\-\-minimalrendering]
 .fi
 .SH DESCRIPTION
 .B rendercheck
@@ -34,6 +34,10 @@ commas and have no spaces.
 .BI \-v|\-\-verbose
 Enables verbose printing of information on tests run, and successes and
 failures.
+.TP
+.BI \-\-minimalrendering
+Disables copying of offscreen destinations to the window, which is on by default
+to provide the user with visual feedback.
 .SH BUGS
 Several limitations are documented in the TODO file accompanying the source.
 Please report any further bugs you find to http://bugs.freedesktop.org/.

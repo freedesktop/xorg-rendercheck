@@ -35,9 +35,8 @@ fill_test(Display *dpy, picture_info *win, picture_info *src)
 	char name[20];
 
 	get_pixel(dpy, src, 0, 0, &tested);
-	/* Copy the output to the window, so the user sees something visual. */
-	XRenderComposite(dpy, PictOpSrc, src->pict, 0, win->pict, 0, 0, 0, 0,
-	    0, 0, win_width, win_height);
+
+	copy_pict_to_win(dpy, src, win);
 
 	strcpy(name, "fill ");
 	describe_format(name, 20 - strlen(name), src->format);

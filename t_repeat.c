@@ -96,15 +96,8 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 				    0, 0, 0, 0, 0, 0, win_width, win_height);
 			}
 		}
-		/* Copy the output to the window, so the user sees something
-		 * visual.
-		 */
-		if (win != dst) {
-			XRenderComposite(dpy, PictOpSrc,
-					 dst->pict, None, win->pict,
-					 0, 0, 0, 0, 0, 0,
-					 win_width, win_height);
-		}
+
+		copy_pict_to_win(dpy, dst, win);
 		tdst = dst_color->color;
 		color_correct(dst, &tdst);
 

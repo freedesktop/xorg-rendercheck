@@ -631,3 +631,20 @@ do {								\
 
 	return tests_passed == tests_total;
 }
+
+/**
+ * \brief copies the contents of a picture to the window.
+ *
+ * This is used in tests so that the user sees flashing colors indicating that
+ * rendercheck is really doing things.  The minimalrendering commandline option
+ * indicates that this behavior should be disabled.
+ */
+void
+copy_pict_to_win(Display *dpy, picture_info *pict, picture_info *win)
+{
+	if (pict == win || minimalrendering)
+		return;
+
+	XRenderComposite(dpy, PictOpSrc, pict->pict, 0, win->pict, 0, 0,
+	    0, 0, 0, 0, win_width, win_height);
+}

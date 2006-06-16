@@ -82,7 +82,7 @@ struct op_info {
 extern int pixmap_move_iter;
 extern int win_width, win_height;
 extern struct op_info ops[];
-extern Bool is_verbose;
+extern Bool is_verbose, minimalrendering;
 extern color4d colors[];
 extern int enabled_tests;
 extern picture_info *argb32white, *argb32red, *argb32green, *argb32blue;
@@ -108,6 +108,9 @@ argb_fill(Display *dpy, picture_info *p, int x, int y, int w, int h, float a,
 
 Bool
 do_tests(Display *dpy, picture_info *win);
+
+void
+copy_pict_to_win(Display *dpy, picture_info *pict, picture_info *win);
 
 /* ops.c */
 void

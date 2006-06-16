@@ -29,7 +29,7 @@
 extern int num_ops;
 extern int num_colors;
 
-int is_verbose = FALSE;
+Bool is_verbose = FALSE, minimalrendering = FALSE;
 int enabled_tests = ~0;		/* Enable all tests by default */
 
 /* Number of times to repeat operations so that pixmaps will tend to get moved
@@ -104,7 +104,7 @@ static void
 usage (char *program)
 {
     fprintf(stderr, "usage: %s [-d|--display display] [-v|--verbose]\n"
-	"\t[-t test1,test2,...] [--sync]\n"
+	"\t[-t test1,test2,...] [--sync] [--minimalrendering]\n"
             "\tAvailable tests: dcoors,scoords,mcoords,tscoords,\n"
             "\t\ttmcoords,blend,composite,cacomposite,gradients,repeat,triangles\n",
 	program);
@@ -129,6 +129,8 @@ int main(int argc, char **argv)
 		{ "tests",	required_argument,	NULL,	't' },
 		{ "verbose",	no_argument,		NULL,	'v' },
 		{ "sync",	no_argument,		&is_sync, 1},
+		{ "minimalrendering", no_argument,	&minimalrendering,
+		    TRUE},
 		{ NULL,		0,			NULL,	0 }
 	};
 
