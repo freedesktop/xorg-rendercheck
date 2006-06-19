@@ -171,6 +171,7 @@ eval_diff(char *name, color4d *expected, color4d *test, int x, int y,
 	diff = max(max(max(rdiff, gdiff), bdiff), adiff);
 	if (diff > 3.0) {
 		printf("%s test error of %.4f at (%d, %d) --\n"
+		    "           R    G    B    A\n"
 		    "got:       %.2f %.2f %.2f %.2f\n"
 		    "expected:  %.2f %.2f %.2f %.2f\n", name, diff, x, y,
 		    test->r, test->g, test->b, test->a,
