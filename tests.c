@@ -27,8 +27,13 @@
 
 #include "rendercheck.h"
 
+XRenderPictFormat **format_list;
+int nformats;
+int argb32index;
+
 /* Note: changing the order of these colors may disrupt tests that depend on
- * specific colors.  Just add to the end if you need.
+ * specific colors.  Just add to the end if you need.  These are
+ * not premultiplied, but will be in main().
  */
 color4d colors[] = {
 	{1.0, 1.0, 1.0, 1.0},
@@ -193,28 +198,86 @@ argb_fill(Display *dpy, picture_info *p, int x, int y, int w, int h, float a,
 	XRenderFillRectangle(dpy, PictOpSrc, p->pict, &rendercolor, x, y, w, h);
 }
 
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+
+/* Create a set of direct format XRenderPictFormats for later use.  This lets
+ * us get more formats than just the standard required set, and lets us attach
+ * names to them.
+ */
+void
+create_formats_list(Display *dpy)
+{
+    int i;
+    int nformats_allocated = 5;
+    XRenderPictFormat templ;
+
+    memset(&templ, 0, sizeof(templ));
+    templ.type = PictTypeDirect;
+
+    format_list = malloc(sizeof(XRenderPictFormat *) * nformats_allocated);
+    if (format_list == NULL)
+	errx(1, "malloc error");
+    nformats = 0;
+
+    argb32index = -1;
+    for (i = 0; ; i++) {
+	if (nformats + 1 == nformats_allocated) {
+	    nformats_allocated *= 2;
+	    format_list = realloc(format_list, sizeof(XRenderPictFormat *) *
+		nformats_allocated);
+	    if (format_list == NULL)
+		errx(1, "realloc error");
+	}
+
+	format_list[nformats] = XRenderFindFormat(dpy, PictFormatType, &templ,
+	    i);
+	if (format_list[nformats] != NULL) {
+	    char name[20];
+
+	    /* Our testing code isn't all that hot, so don't bother trying at
+	     * the low depths yet.
+	     */
+	    if (0 && bit_count(format_list[nformats]->direct.alphaMask) < 5 &&
+		bit_count(format_list[nformats]->direct.redMask) < 5)
+	    {
+		continue;
+	    }
+
+	    if (format_list[nformats] == XRenderFindStandardFormat(dpy,
+		PictStandardARGB32))
+	    {
+		argb32index = nformats;
+	    }
+	    describe_format(name, 20, format_list[nformats]);
+	    printf("Found server-supported format: %s\n", name);
+
+	    nformats++;
+	} else {
+	    break;
+	}
+    }
+    if (argb32index == -1) {
+	errx(1, "required ARGB32 format not found");
+    }
+}
+
 Bool
 do_tests(Display *dpy, picture_info *win)
 {
 	int i, j, src, dst = 0, mask;
-	int num_dests, num_formats;
+	int num_dests;
 	picture_info *dests, *pictures_1x1, *pictures_10x10, picture_3x3, *pictures_solid;
 	int success_mask = 0, tests_passed = 0, tests_total = 0;
 
-	num_dests = 3;
+	create_formats_list(dpy);
+
+	num_dests = nformats;
 	dests = (picture_info *)malloc(num_dests * sizeof(dests[0]));
 	if (dests == NULL)
 		errx(1, "malloc error");
 
-	dests[0].format = XRenderFindStandardFormat(dpy, PictStandardARGB32);
-	dests[1].format = XRenderFindStandardFormat(dpy, PictStandardRGB24);
-	dests[2].format = XRenderFindStandardFormat(dpy, PictStandardA8);
-	/*
-	dests[3].format = XRenderFindStandardFormat(dpy, PictStandardA4);
-	dests[4].format = XRenderFindStandardFormat(dpy, PictStandardA1);
-	*/
-
 	for (i = 0; i < num_dests; i++) {
+		dests[i].format = format_list[i];
 		dests[i].d = XCreatePixmap(dpy, RootWindow(dpy, 0),
 		    win_width, win_height, dests[i].format->depth);
 		dests[i].pict = XRenderCreatePicture(dpy, dests[i].d,
@@ -226,20 +289,17 @@ do_tests(Display *dpy, picture_info *win)
 		describe_format(dests[i].name, 20, dests[i].format);
 	}
 
-	num_formats = 3;
-
-	pictures_1x1 = (picture_info *)malloc(num_colors * num_formats *
+	pictures_1x1 = (picture_info *)malloc(num_colors * nformats *
 	    sizeof(picture_info));
 	if (pictures_1x1 == NULL)
 		errx(1, "malloc error");
 
-	for (i = 0; i < num_colors * num_formats; i++) {
+	for (i = 0; i < num_colors * nformats; i++) {
 		XRenderPictureAttributes pa;
-		color4d *c = &colors[i / num_formats];
+		color4d *c = &colors[i / nformats];
 
 		/* The standard PictFormat numbers go from 0 to 4 */
-		pictures_1x1[i].format = XRenderFindStandardFormat(dpy,
-		    i % num_formats);
+		pictures_1x1[i].format = format_list[i % nformats];
 		pictures_1x1[i].d = XCreatePixmap(dpy, RootWindow(dpy, 0), 1,
 		    1, pictures_1x1[i].format->depth);
 		pa.repeat = TRUE;
@@ -260,23 +320,22 @@ do_tests(Display *dpy, picture_info *win)
 		pictures_1x1[i].color = *c;
 		color_correct(&pictures_1x1[i], &pictures_1x1[i].color);
 	}
-	argb32white = &pictures_1x1[0 * num_formats];
-	argb32red = &pictures_1x1[1 * num_formats];
-	argb32green = &pictures_1x1[2 * num_formats];
-	argb32blue = &pictures_1x1[3 * num_formats];
+	argb32white = &pictures_1x1[0 * nformats + argb32index];
+	argb32red = &pictures_1x1[1 * nformats + argb32index];
+	argb32green = &pictures_1x1[2 * nformats + argb32index];
+	argb32blue = &pictures_1x1[3 * nformats + argb32index];
 
-	pictures_10x10 = (picture_info *)malloc(num_colors * num_formats *
+	pictures_10x10 = (picture_info *)malloc(num_colors * nformats *
 	    sizeof(picture_info));
 	if (pictures_10x10 == NULL)
 		errx(1, "malloc error");
 
-	for (i = 0; i < num_colors * num_formats; i++) {
+	for (i = 0; i < num_colors * nformats; i++) {
 		XRenderPictureAttributes pa;
-		color4d *c = &colors[i / num_formats];
+		color4d *c = &colors[i / nformats];
 
 		/* The standard PictFormat numbers go from 0 to 4 */
-		pictures_10x10[i].format = XRenderFindStandardFormat(dpy,
-		    i % num_formats);
+		pictures_10x10[i].format = format_list[i % nformats];
 		pictures_10x10[i].d = XCreatePixmap(dpy, RootWindow(dpy, 0), 10,
 		    10, pictures_10x10[i].format->depth);
 		pa.repeat = TRUE;
@@ -335,13 +394,13 @@ do {								\
 		Bool ok, group_ok = TRUE;
 
 		printf("Beginning testing of filling of 1x1R pictures\n");
-		for (i = 0; i < num_colors * num_formats; i++) {
+		for (i = 0; i < num_colors * nformats; i++) {
 			ok = fill_test(dpy, win, &pictures_1x1[i]);
 			RECORD_RESULTS();
 		}
 
 		printf("Beginning testing of filling of 10x10 pictures\n");
-		for (i = 0; i < num_colors * num_formats; i++) {
+		for (i = 0; i < num_colors * nformats; i++) {
 			ok = fill_test(dpy, win, &pictures_10x10[i]);
 			RECORD_RESULTS();
 		}
@@ -353,9 +412,8 @@ do {								\
 		Bool ok, group_ok = TRUE;
 
 		printf("Beginning dest coords test\n");
-		/* 0 and num_formats should result in ARGB8888 red on ARGB8888 white. */
-		ok = dstcoords_test(dpy, win, &dests[0], &pictures_1x1[0],
-		    &pictures_1x1[num_formats]);
+		ok = dstcoords_test(dpy, win, &dests[0], argb32white,
+		    argb32red);
 		RECORD_RESULTS();
 		if (group_ok)
 			success_mask |= TEST_DSTCOORDS;
@@ -365,7 +423,7 @@ do {								\
 		Bool ok, group_ok = TRUE;
 
 		printf("Beginning src coords test\n");
-		ok = srccoords_test(dpy, win, &pictures_1x1[0], FALSE);
+		ok = srccoords_test(dpy, win, argb32white, FALSE);
 		RECORD_RESULTS();
 		if (group_ok)
 			success_mask |= TEST_SRCCOORDS;
@@ -375,7 +433,7 @@ do {								\
 		Bool ok, group_ok = TRUE;
 
 		printf("Beginning mask coords test\n");
-		ok = srccoords_test(dpy, win, &pictures_1x1[0], TRUE);
+		ok = srccoords_test(dpy, win, argb32white, TRUE);
 		RECORD_RESULTS();
 		if (group_ok)
 			success_mask |= TEST_MASKCOORDS;
@@ -385,7 +443,7 @@ do {								\
 		Bool ok, group_ok = TRUE;
 
 		printf("Beginning transformed src coords test\n");
-		ok = trans_coords_test(dpy, win, &pictures_1x1[0], FALSE);
+		ok = trans_coords_test(dpy, win, argb32white, FALSE);
 		RECORD_RESULTS();
 		if (group_ok)
 			success_mask |= TEST_TSRCCOORDS;
@@ -395,7 +453,7 @@ do {								\
 		Bool ok, group_ok = TRUE;
 
 		printf("Beginning transformed mask coords test\n");
-		ok = trans_coords_test(dpy, win, &pictures_1x1[0], TRUE);
+		ok = trans_coords_test(dpy, win, argb32white, TRUE);
 		RECORD_RESULTS();
 		if (group_ok)
 			success_mask |= TEST_TMASKCOORDS;
@@ -415,7 +473,7 @@ do {								\
 			printf("Beginning %s blend test on %s\n", ops[i].name,
 			    pi->name);
 
-			for (src = 0; src < num_colors * num_formats; src++) {
+			for (src = 0; src < num_colors * nformats; src++) {
 				for (dst = 0; dst < num_colors; dst++) {
 					ok = blend_test(dpy, win, pi, i,
 					    &pictures_1x1[src],
@@ -607,19 +665,19 @@ do {								\
 			printf("Beginning %s Triangles test on %s\n",
 			    ops[i].name, pi->name);
 			ok = triangles_test(dpy, win, pi, i,
-			    &pictures_1x1[num_formats], &pictures_1x1[0]);
+			    argb32red, argb32white);
 			RECORD_RESULTS();
 
 			printf("Beginning %s TriStrip test on %s\n",
 			    ops[i].name, pi->name);
 			ok = tristrip_test(dpy, win, pi, i,
-			    &pictures_1x1[num_formats], &pictures_1x1[0]);
+			    argb32red, argb32white);
 			RECORD_RESULTS();
 
 			printf("Beginning %s TriFan test on %s\n",
 			    ops[i].name, pi->name);
 			ok = trifan_test(dpy, win, pi, i,
-			    &pictures_1x1[num_formats], &pictures_1x1[0]);
+			    argb32red, argb32white);
 			RECORD_RESULTS();
 		}
 	    }

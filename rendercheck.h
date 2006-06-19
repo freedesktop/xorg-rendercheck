@@ -91,6 +91,9 @@ extern picture_info *argb32white, *argb32red, *argb32green, *argb32blue;
 void
 describe_format(char *desc, int len, XRenderPictFormat *format);
 
+int
+bit_count(int i);
+
 /* tests.c */
 void
 color_correct(picture_info *pi, color4d *color);

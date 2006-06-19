@@ -40,7 +40,7 @@ int pixmap_move_iter = 1;
 int win_width = 40;
 int win_height = 40;
 
-static int
+int
 bit_count(int i)
 {
 	int count;
