@@ -52,10 +52,14 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 
 	snprintf(testname, 20, "%s blend", ops[op].name);
 	if (!eval_diff(testname, &expected, &tested, 0, 0, is_verbose)) {
-		printf("src color: %.2f %.2f %.2f %.2f\n"
+		char srcformat[20];
+
+		describe_format(srcformat, 20, src_color->format);
+		printf("src color: %.2f %.2f %.2f %.2f (%s)\n"
 		    "dst color: %.2f %.2f %.2f %.2f\n",
 		    src_color->color.r, src_color->color.g,
 		    src_color->color.b, src_color->color.a,
+		    srcformat,
 		    dst_color->color.r, dst_color->color.g,
 		    dst_color->color.b, dst_color->color.a);
 		printf("src: %s, dst: %s\n", src_color->name, dst->name);
