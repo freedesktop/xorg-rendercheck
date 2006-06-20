@@ -234,12 +234,14 @@ create_formats_list(Display *dpy)
 	    i);
 	if (format_list[nformats] != NULL) {
 	    char name[20];
+	    int alphabits = bit_count(format_list[nformats]->direct.alphaMask);
+	    int redbits = bit_count(format_list[nformats]->direct.redMask);
 
 	    /* Our testing code isn't all that hot, so don't bother trying at
 	     * the low depths yet.
 	     */
-	    if (0 && bit_count(format_list[nformats]->direct.alphaMask) < 5 &&
-		bit_count(format_list[nformats]->direct.redMask) < 5)
+	    if ((redbits >= 1 && redbits <= 4) ||
+		(alphabits >= 1 && alphabits <= 4))
 	    {
 		continue;
 	    }
