@@ -5,7 +5,8 @@ rendercheck \- simple tests of the X Render extension.
 .SH SYNOPSIS
 .nf
 .B rendercheck [\-d|\-\-display display] [\-i|\-\-iter] [\-\-sync] \
-[\-t|\-\-tests test1,test2,test3,...] [\-v|\-\-verbose] [\-\-minimalrendering]
+[\-t|\-\-tests test1,test2,test3,...] [\-o|\-\-ops op1,op2,op3,...]
+[\-v|\-\-verbose] [\-\-minimalrendering]
 .fi
 .SH DESCRIPTION
 .B rendercheck
@@ -30,6 +31,9 @@ Enables only a specific subset of the possible tests.  Test names include
 fill, dcoords, scoords, mcoords, tscoords, tmcoords, blend, composite,
 cacomposite, gradients, repeat, and triangles.  Names must be separated by
 commas and have no spaces.
+.TP
+.BI \-o|\-\-ops
+Enables only a specific subset of the Render operators.
 .TP
 .BI \-v|\-\-verbose
 Enables verbose printing of information on tests run, and successes and

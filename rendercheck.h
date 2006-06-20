@@ -64,6 +64,7 @@ typedef struct _picture_info {
 struct op_info {
 	int op;
 	char *name;
+	Bool disabled;
 };
 
 #define TEST_FILL		0x0001

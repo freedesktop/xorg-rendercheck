@@ -466,6 +466,9 @@ do {								\
 		Bool ok, group_ok = TRUE;
 
 		for (i = 0; i < num_ops; i++) {
+		    if (ops[i].disabled)
+			continue;
+
 		    for (j = 0; j <= num_dests; j++) {
 			picture_info *pi;
 
@@ -504,6 +507,9 @@ do {								\
 		Bool ok, group_ok = TRUE;
 
 		for (i = 0; i < num_ops; i++) {
+		    if (ops[i].disabled)
+			continue;
+
 		    for (j = 0; j <= num_dests; j++) {
 			picture_info *pi;
 
@@ -550,6 +556,9 @@ do {								\
 		Bool ok, group_ok = TRUE;
 
 		for (i = 0; i < num_ops; i++) {
+		    if (ops[i].disabled)
+			continue;
+
 		    for (j = 0; j <= num_dests; j++) {
 			picture_info *pi;
 
@@ -596,6 +605,9 @@ do {								\
 	    Bool ok, group_ok = TRUE;
 
             for (i = 0; i < num_ops; i++) {
+		if (ops[i].disabled)
+		    continue;
+
                 for (j = 0; j <= num_dests; j++) {
                     picture_info *pi;
                     
@@ -623,6 +635,9 @@ do {								\
 	    Bool ok, group_ok = TRUE;
 
             for (i = 0; i < num_ops; i++) {
+		if (ops[i].disabled)
+		    continue;
+
                 for (j = 0; j <= num_dests; j++) {
                     picture_info *pi;
                     
@@ -657,6 +672,9 @@ do {								\
 	    Bool ok, group_ok = TRUE;
 
 	    for (i = 0; i < num_ops; i++) {
+		if (ops[i].disabled)
+		    continue;
+
 		for (j = 0; j <= num_dests; j++) {
 			picture_info *pi;
 

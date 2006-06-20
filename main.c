@@ -104,7 +104,8 @@ static void
 usage (char *program)
 {
     fprintf(stderr, "usage: %s [-d|--display display] [-v|--verbose]\n"
-	"\t[-t test1,test2,...] [--sync] [--minimalrendering]\n"
+	"\t[-t test1,test2,...] [-o op1,op2,...] [--sync]"
+	"\t[--minimalrendering]\n"
             "\tAvailable tests: dcoors,scoords,mcoords,tscoords,\n"
             "\t\ttmcoords,blend,composite,cacomposite,gradients,repeat,triangles\n",
 	program);
@@ -121,12 +122,13 @@ int main(int argc, char **argv)
 	XSetWindowAttributes as;
 	picture_info window;
 	char *display = NULL;
-	char *test, *nextname;
+	char *test, *opname, *nextname;
 
 	static struct option longopts[] = {
 		{ "display",	required_argument,	NULL,	'd' },
 		{ "iterations",	required_argument,	NULL,	'i' },
 		{ "tests",	required_argument,	NULL,	't' },
+		{ "ops",	required_argument,	NULL,	'o' },
 		{ "verbose",	no_argument,		NULL,	'v' },
 		{ "sync",	no_argument,		&is_sync, 1},
 		{ "minimalrendering", no_argument,	&minimalrendering,
@@ -134,13 +136,30 @@ int main(int argc, char **argv)
 		{ NULL,		0,			NULL,	0 }
 	};
 
-	while ((o = getopt_long(argc, argv, "d:i:t:v", longopts, NULL)) != -1) {
+	while ((o = getopt_long(argc, argv, "d:i:t:o:v", longopts, NULL)) != -1) {
 		switch (o) {
 		case 'd':
 			display = optarg;
 			break;
 		case 'i':
 			pixmap_move_iter = atoi(optarg);
+			break;
+		case 'o':
+			for (i = 0; i < num_ops; i++)
+				ops[i].disabled = TRUE;
+
+			nextname = optarg;
+			while ((opname = strsep(&nextname, ",")) != NULL) {
+				for (i = 0; i < num_ops; i++) {
+					if (strcasecmp(ops[i].name, opname) !=
+					    0)
+						continue;
+					ops[i].disabled = FALSE;
+					break;
+				}
+				if (i == num_ops)
+					usage(argv[0]);
+			}
 			break;
 		case 't':
 			nextname = optarg;
