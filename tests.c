@@ -706,6 +706,16 @@ do {								\
 		success_mask |= TEST_TRIANGLES;
 	}
 
+        if (enabled_tests & TEST_BUG7366) {
+	    Bool ok, group_ok = TRUE;
+
+	    ok = bug7366_test(dpy);
+	    RECORD_RESULTS();
+
+	    if (group_ok)
+		success_mask |= TEST_BUG7366;
+	}
+
 	printf("%d tests passed of %d total\n", tests_passed, tests_total);
 
 	return tests_passed == tests_total;

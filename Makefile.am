@@ -7,6 +7,7 @@ rendercheck_SOURCES = \
 	rendercheck.h \
 	tests.c \
 	t_blend.c \
+	t_bug7366.c \
 	t_composite.c \
 	t_dstcoords.c \
 	t_fill.c \

@@ -192,6 +192,8 @@ int main(int argc, char **argv)
 					enabled_tests |= TEST_REPEAT;
 				} else if (strcmp(test, "triangles") == 0) {
 					enabled_tests |= TEST_TRIANGLES;
+				} else if (strcmp(test, "bug7366") == 0) {
+					enabled_tests |= TEST_BUG7366;
 				} else {
 					usage(argv[0]);
 				}

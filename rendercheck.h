@@ -79,6 +79,7 @@ struct op_info {
 #define TEST_GRADIENTS  	0x0200
 #define TEST_REPEAT	  	0x0400
 #define TEST_TRIANGLES  	0x0800
+#define TEST_BUG7366		0x1000
 
 extern int pixmap_move_iter;
 extern int win_width, win_height;
@@ -169,3 +170,6 @@ tristrip_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 Bool
 trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     picture_info *src_color, picture_info *dst_color);
+
+Bool
+bug7366_test(Display *dpy);
