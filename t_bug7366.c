@@ -110,6 +110,27 @@ bug7366_test_set_picture_clip_rectangles(Display *dpy)
     return TRUE;
 }
 
+/**
+ * Check SetPictureFilter on a source potentially causing a crash.
+ */
+static Bool
+bug7366_test_set_picture_filter(Display *dpy)
+{
+    Picture source_pict;
+    XRenderColor color;
+
+    memset(&color, 0, sizeof(color));
+    source_pict = XRenderCreateSolidFill(dpy, &color);
+
+    XRenderSetPictureFilter(dpy, source_pict, "bilinear", NULL, 0);
+    XSync(dpy, FALSE);
+    XSetErrorHandler(NULL);
+
+    XRenderFreePicture(dpy, source_pict);
+
+    return TRUE;
+}
+
 Bool
 bug7366_test(Display *dpy)
 {
@@ -123,6 +144,7 @@ bug7366_test(Display *dpy)
     bug7366_test_set_picture_transform(dpy);
     bug7366_test_set_alpha_map(dpy);
     bug7366_test_set_picture_clip_rectangles(dpy);
+    bug7366_test_set_picture_filter(dpy);
 
     /* If the server isn't gone, then we've succeeded. */
     return TRUE;
