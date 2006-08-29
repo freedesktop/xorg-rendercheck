@@ -63,6 +63,15 @@ static void destroy_dot_picture(Display *dpy, picture_info *p)
 	free(p);
 }
 
+static void init_transform (XTransform *t)
+{
+	int i, j;
+
+	for (i = 0; i < 3; i++)
+		for (j = 0; j < 3; j++)
+			t->matrix[i][j] = XDoubleToFixed((i == j) ? 1 : 0);
+}
+
 /* Test drawing a 5x5 source image scaled 8x, as either a source or mask.
  */
 Bool
@@ -82,9 +91,9 @@ trans_coords_test(Display *dpy, picture_info *win, picture_info *white,
 		return FALSE;
 	}
 
-	t.matrix[0][0] = 1.0; t.matrix[0][1] = 0.0; t.matrix[0][2] = 0.0;
-	t.matrix[1][0] = 0.0; t.matrix[1][1] = 1.0; t.matrix[1][2] = 0.0;
-	t.matrix[2][0] = 0.0; t.matrix[2][1] = 0.0; t.matrix[2][2] = 8.0;
+	init_transform(&t);
+	t.matrix[2][2] = XDoubleToFixed(8);
+
 	XRenderSetPictureTransform(dpy, src->pict, &t);
 
 	if (!test_mask)
@@ -137,9 +146,9 @@ trans_coords_test(Display *dpy, picture_info *win, picture_info *white,
 			printf("\n");
 		}
 	}
-	t.matrix[0][0] = 1.0; t.matrix[0][1] = 0.0; t.matrix[0][2] = 0.0;
-	t.matrix[1][0] = 0.0; t.matrix[1][1] = 1.0; t.matrix[1][2] = 0.0;
-	t.matrix[2][0] = 0.0; t.matrix[2][1] = 0.0; t.matrix[2][2] = 1.0;
+
+	init_transform(&t);
+
 	XRenderSetPictureTransform(dpy, src->pict, &t);
 
 	destroy_dot_picture(dpy, src);
