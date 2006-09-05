@@ -106,8 +106,9 @@ usage (char *program)
     fprintf(stderr, "usage: %s [-d|--display display] [-v|--verbose]\n"
 	"\t[-t test1,test2,...] [-o op1,op2,...] [--sync]"
 	"\t[--minimalrendering]\n"
-            "\tAvailable tests: dcoords,scoords,mcoords,tscoords,\n"
-            "\t\ttmcoords,blend,composite,cacomposite,gradients,repeat,triangles\n",
+            "\tAvailable tests: fill,dcoords,scoords,mcoords,tscoords,\n"
+            "\t\ttmcoords,blend,composite,cacomposite,gradients,repeat,triangles,\n"
+            "\t\tbug7366\n",
 	program);
     exit(1);
 }
