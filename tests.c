@@ -159,7 +159,7 @@ eval_diff(char *name, color4d *expected, color4d *test, int x, int y,
 	rscale = 1.0 * (1 << 5);
 	gscale = 1.0 * (1 << 6);
 	bscale = 1.0 * (1 << 5);
-	ascale = 1.0;
+	ascale = 1.0 * 32;
 	rdiff = fabs(test->r - expected->r) * rscale;
 	bdiff = fabs(test->g - expected->g) * gscale;
 	gdiff = fabs(test->b - expected->b) * bscale;
