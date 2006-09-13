@@ -382,6 +382,7 @@ do_tests(Display *dpy, picture_info *win)
             c.green = (int)(colors[i].g*65535);
             c.blue = (int)(colors[i].b*65535);
             pictures_solid[i].pict = XRenderCreateSolidFill(dpy, &c);
+            pictures_solid[i].format = format_list[argb32index];
             pictures_solid[i].name = "Solid";
         }
 
