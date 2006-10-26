@@ -219,6 +219,9 @@ create_formats_list(Display *dpy)
 
     argb32index = -1;
     for (i = 0; ; i++) {
+	char name[20];
+	int alphabits, redbits;
+
 	if (nformats + 1 == nformats_allocated) {
 	    nformats_allocated *= 2;
 	    format_list = realloc(format_list, sizeof(XRenderPictFormat *) *
@@ -229,50 +232,48 @@ create_formats_list(Display *dpy)
 
 	format_list[nformats] = XRenderFindFormat(dpy, PictFormatType, &templ,
 	    i);
-	if (format_list[nformats] != NULL) {
-	    char name[20];
-	    int alphabits = bit_count(format_list[nformats]->direct.alphaMask);
-	    int redbits = bit_count(format_list[nformats]->direct.redMask);
+	if (format_list[nformats] == NULL)
+	    break;
 
-	    /* Our testing code isn't all that hot, so don't bother trying at
-	     * the low depths yet.
-	     */
-	    if ((redbits >= 1 && redbits <= 4) ||
-		(alphabits >= 1 && alphabits <= 4))
-	    {
+	alphabits = bit_count(format_list[nformats]->direct.alphaMask);
+	redbits = bit_count(format_list[nformats]->direct.redMask);
+
+	/* Our testing code isn't all that hot, so don't bother trying at
+	 * the low depths yet.
+	 */
+	if ((redbits >= 1 && redbits <= 4) ||
+	    (alphabits >= 1 && alphabits <= 4))
+	{
+	    continue;
+	}
+
+	describe_format(name, 20, format_list[nformats]);
+
+	if (format_whitelist_len != 0) {
+	    Bool ok = FALSE;
+	    int j;
+
+	    for (j = 0; j < format_whitelist_len; j++) {
+		if (strcmp(format_whitelist[j], name) == 0) {
+		    ok = TRUE;
+		    break;
+		}
+	    }
+	    if (!ok) {
+		printf("Ignoring server-supported format: %s\n", name);
 		continue;
 	    }
-
-	    describe_format(name, 20, format_list[nformats]);
-
-	    if (format_whitelist_len != 0) {
-		Bool ok = FALSE;
-		int j;
-
-		for (j = 0; j < format_whitelist_len; j++) {
-		    if (strcmp(format_whitelist[j], name) == 0) {
-			ok = TRUE;
-			break;
-		    }
-		}
-		if (!ok) {
-		    printf("Ignoring server-supported format: %s\n", name);
-		    continue;
-		}
-	    }
-
-	    if (format_list[nformats] == XRenderFindStandardFormat(dpy,
-		PictStandardARGB32))
-	    {
-		argb32index = nformats;
-	    }
-
-	    printf("Found server-supported format: %s\n", name);
-
-	    nformats++;
-	} else {
-	    break;
 	}
+
+	if (format_list[nformats] == XRenderFindStandardFormat(dpy,
+	    PictStandardARGB32))
+	{
+	    argb32index = nformats;
+	}
+
+	printf("Found server-supported format: %s\n", name);
+
+	nformats++;
     }
     if (argb32index == -1) {
 	errx(1, "required ARGB32 format not found");
