@@ -29,6 +29,9 @@
 
 #include "rendercheck.h"
 
+#define TEST_WIDTH	10
+#define TEST_HEIGHT	10
+
 /* Test basic functionality of the triangle operations.  We don't care that much
  * probably (nobody has used them yet), but we can trivially test by filling
  * doing two triangles that will exactly cover the rectangle from 2,2 to 4,4.
@@ -58,12 +61,12 @@ triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 
 	/* Fill the dst to dst_color */
 	XRenderComposite(dpy, PictOpSrc, dst_color->pict, None, dst->pict, 0, 0,
-	    0, 0, 0, 0, win_width, win_height);
+	    0, 0, 0, 0, TEST_WIDTH, TEST_HEIGHT);
 	/* Paint the triangles with src_color */
 	XRenderCompositeTriangles(dpy, ops[op].op, src_color->pict, dst->pict,
 	    XRenderFindStandardFormat(dpy, PictStandardA8), 0, 0, triangles, 2);
 
-	copy_pict_to_win(dpy, dst, win);
+	copy_pict_to_win(dpy, dst, win, TEST_WIDTH, TEST_HEIGHT);
 
 	/* Color expected outside of the triangles */
 	tdst = dst_color->color;
@@ -124,12 +127,12 @@ trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 
 	/* Fill the dst to dst_color */
 	XRenderComposite(dpy, PictOpSrc, dst_color->pict, None, dst->pict, 0, 0,
-	    0, 0, 0, 0, win_width, win_height);
+	    0, 0, 0, 0, TEST_WIDTH, TEST_HEIGHT);
 	/* Paint the triangles with src_color */
 	XRenderCompositeTriFan(dpy, ops[op].op, src_color->pict, dst->pict,
 	    XRenderFindStandardFormat(dpy, PictStandardA8), 0, 0, points, 4);
 
-	copy_pict_to_win(dpy, dst, win);
+	copy_pict_to_win(dpy, dst, win, TEST_WIDTH, TEST_HEIGHT);
 
 	/* Color expected outside of the triangles */
 	tdst = dst_color->color;
@@ -190,12 +193,12 @@ tristrip_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 
 	/* Fill the dst to dst_color */
 	XRenderComposite(dpy, PictOpSrc, dst_color->pict, None, dst->pict, 0, 0,
-	    0, 0, 0, 0, win_width, win_height);
+	    0, 0, 0, 0, TEST_WIDTH, TEST_HEIGHT);
 	/* Paint the triangles with src_color */
 	XRenderCompositeTriStrip(dpy, ops[op].op, src_color->pict, dst->pict,
 	    XRenderFindStandardFormat(dpy, PictStandardA8), 0, 0, points, 4);
 
-	copy_pict_to_win(dpy, dst, win);
+	copy_pict_to_win(dpy, dst, win, TEST_WIDTH, TEST_HEIGHT);
 
 	/* Color expected outside of the triangles */
 	tdst = dst_color->color;

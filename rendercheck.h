@@ -117,7 +117,8 @@ Bool
 do_tests(Display *dpy, picture_info *win);
 
 void
-copy_pict_to_win(Display *dpy, picture_info *pict, picture_info *win);
+copy_pict_to_win(Display *dpy, picture_info *pict, picture_info *win,
+    int width, int height);
 
 /* ops.c */
 void

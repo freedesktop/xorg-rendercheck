@@ -97,7 +97,7 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 			}
 		}
 
-		copy_pict_to_win(dpy, dst, win);
+		copy_pict_to_win(dpy, dst, win, win_width, win_height);
 		tdst = dst_color->color;
 		color_correct(dst, &tdst);
 

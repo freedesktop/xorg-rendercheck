@@ -749,11 +749,12 @@ do {								\
  * indicates that this behavior should be disabled.
  */
 void
-copy_pict_to_win(Display *dpy, picture_info *pict, picture_info *win)
+copy_pict_to_win(Display *dpy, picture_info *pict, picture_info *win,
+    int width, int height)
 {
 	if (pict == win || minimalrendering)
 		return;
 
 	XRenderComposite(dpy, PictOpSrc, pict->pict, 0, win->pict, 0, 0,
-	    0, 0, 0, 0, win_width, win_height);
+	    0, 0, 0, 0, width, height);
 }

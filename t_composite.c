@@ -24,6 +24,9 @@
 
 #include "rendercheck.h"
 
+#define TEST_WIDTH	10
+#define TEST_HEIGHT	10
+
 /* Test a composite of a given operation, source, mask, and destination picture.
  * Fills the window, and samples from the 0,0 pixel corner.
  */
@@ -45,13 +48,13 @@ composite_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	}
 	for (i = 0; i < pixmap_move_iter; i++) {
 		XRenderComposite(dpy, PictOpSrc, dst_color->pict, 0, dst->pict,
-		    0, 0, 0, 0, 0, 0, win_width, win_height);
+		    0, 0, 0, 0, 0, 0, TEST_WIDTH, TEST_HEIGHT);
 		XRenderComposite(dpy, ops[op].op, src_color->pict,
 		    mask_color->pict, dst->pict, 0, 0, 0, 0, 0, 0,
-		    win_width, win_height);
+		    TEST_WIDTH, TEST_HEIGHT);
 	}
 	get_pixel(dpy, dst, 0, 0, &tested);
-	copy_pict_to_win(dpy, dst, win);
+	copy_pict_to_win(dpy, dst, win, TEST_WIDTH, TEST_HEIGHT);
 
 	if (componentAlpha) {
 		pa.component_alpha = FALSE;

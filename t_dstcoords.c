@@ -24,6 +24,9 @@
 
 #include "rendercheck.h"
 
+#define TEST_WIDTH	10
+#define TEST_HEIGHT	10
+
 /* Test destination coordinates by drawing a 3x3 picture offset one pixel.
  * XXX: This should be done with another operation, to catch issues with Render
  * acceleration in the non-CopyArea-equivalent case.
@@ -38,12 +41,12 @@ dstcoords_test(Display *dpy, picture_info *win, picture_info *dst,
 
 	for (i = 0; i < pixmap_move_iter; i++) {
 		XRenderComposite(dpy, PictOpSrc, bg->pict, 0, dst->pict, 0, 0,
-		    0, 0, 0, 0, win_width, win_height);
+		    0, 0, 0, 0, TEST_WIDTH, TEST_HEIGHT);
 		XRenderComposite(dpy, PictOpSrc, fg->pict, 0, dst->pict, 0, 0,
 		    0, 0, 1, 1, 1, 1);
 	}
 
-	copy_pict_to_win(dpy, dst, win);
+	copy_pict_to_win(dpy, dst, win, TEST_WIDTH, TEST_HEIGHT);
 
 	for (x = 0; x < 3; x++) {
 		for (y = 0; y < 3; y++) {

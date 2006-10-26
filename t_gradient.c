@@ -216,7 +216,7 @@ Bool linear_gradient_test(Display *dpy, picture_info *win,
                 XRenderComposite(dpy, ops[op].op, gradient, 0,
                                  dst->pict, 0, 0, 0, 0, 0, 0, win_width, win_height);
 
-		copy_pict_to_win(dpy, dst, win);
+		copy_pict_to_win(dpy, dst, win, win_width, win_height);
 
                 pix = test_pixels;
                 while (pix->x >= 0) {

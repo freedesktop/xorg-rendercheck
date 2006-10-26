@@ -36,7 +36,7 @@ fill_test(Display *dpy, picture_info *win, picture_info *src)
 
 	get_pixel(dpy, src, 0, 0, &tested);
 
-	copy_pict_to_win(dpy, src, win);
+	copy_pict_to_win(dpy, src, win, win_width, win_height);
 
 	strcpy(name, "fill ");
 	describe_format(name, 20 - strlen(name), src->format);
