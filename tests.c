@@ -246,12 +246,30 @@ create_formats_list(Display *dpy)
 		continue;
 	    }
 
+	    describe_format(name, 20, format_list[nformats]);
+
+	    if (format_whitelist_len != 0) {
+		Bool ok = FALSE;
+		int j;
+
+		for (j = 0; j < format_whitelist_len; j++) {
+		    if (strcmp(format_whitelist[j], name) == 0) {
+			ok = TRUE;
+			break;
+		    }
+		}
+		if (!ok) {
+		    printf("Ignoring server-supported format: %s\n", name);
+		    continue;
+		}
+	    }
+
 	    if (format_list[nformats] == XRenderFindStandardFormat(dpy,
 		PictStandardARGB32))
 	    {
 		argb32index = nformats;
 	    }
-	    describe_format(name, 20, format_list[nformats]);
+
 	    printf("Found server-supported format: %s\n", name);
 
 	    nformats++;

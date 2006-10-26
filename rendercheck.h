@@ -87,6 +87,8 @@ extern struct op_info ops[];
 extern Bool is_verbose, minimalrendering;
 extern color4d colors[];
 extern int enabled_tests;
+extern int format_whitelist_len;
+extern char **format_whitelist;
 extern picture_info *argb32white, *argb32red, *argb32green, *argb32blue;
 
 /* main.c */

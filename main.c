@@ -32,6 +32,9 @@ extern int num_colors;
 Bool is_verbose = FALSE, minimalrendering = FALSE;
 int enabled_tests = ~0;		/* Enable all tests by default */
 
+int format_whitelist_len = 0;
+char **format_whitelist;
+
 /* Number of times to repeat operations so that pixmaps will tend to get moved
  * into offscreen memory and allow hardware acceleration.
  */
@@ -104,8 +107,8 @@ static void
 usage (char *program)
 {
     fprintf(stderr, "usage: %s [-d|--display display] [-v|--verbose]\n"
-	"\t[-t test1,test2,...] [-o op1,op2,...] [--sync]"
-	"\t[--minimalrendering]\n"
+	"\t[-t test1,test2,...] [-o op1,op2,...] [-f format1,format2,...]\n"
+	"\t[--sync] [--minimalrendering]\n"
             "\tAvailable tests: fill,dcoords,scoords,mcoords,tscoords,\n"
             "\t\ttmcoords,blend,composite,cacomposite,gradients,repeat,triangles,\n"
             "\t\tbug7366\n",
@@ -123,11 +126,12 @@ int main(int argc, char **argv)
 	XSetWindowAttributes as;
 	picture_info window;
 	char *display = NULL;
-	char *test, *opname, *nextname;
+	char *test, *format, *opname, *nextname;
 
 	static struct option longopts[] = {
 		{ "display",	required_argument,	NULL,	'd' },
 		{ "iterations",	required_argument,	NULL,	'i' },
+		{ "formats",	required_argument,	NULL,	'f' },
 		{ "tests",	required_argument,	NULL,	't' },
 		{ "ops",	required_argument,	NULL,	'o' },
 		{ "verbose",	no_argument,		NULL,	'v' },
@@ -137,7 +141,7 @@ int main(int argc, char **argv)
 		{ NULL,		0,			NULL,	0 }
 	};
 
-	while ((o = getopt_long(argc, argv, "d:i:t:o:v", longopts, NULL)) != -1) {
+	while ((o = getopt_long(argc, argv, "d:i:f:t:o:v", longopts, NULL)) != -1) {
 		switch (o) {
 		case 'd':
 			display = optarg;
@@ -161,6 +165,29 @@ int main(int argc, char **argv)
 				if (i == num_ops)
 					usage(argv[0]);
 			}
+			break;
+		case 'f':
+			nextname = optarg;
+			for (format_whitelist_len = 0;;format_whitelist_len++)
+			{
+				if ((format = strsep(&nextname, ",")) == NULL)
+					break;
+			}
+
+			format_whitelist = malloc(sizeof(char *) *
+			    format_whitelist_len);
+			if (format_whitelist == NULL)
+				errx(1, "malloc");
+
+			/* Now the list is separated by \0s, so use strlen to
+			 * step between entries.
+			 */
+			format = optarg;
+			for (i = 0; i < format_whitelist_len; i++) {
+				format_whitelist[i] = strdup(format);
+				format += strlen(format) + 1;
+			}
+
 			break;
 		case 't':
 			nextname = optarg;
