@@ -289,6 +289,7 @@ do_tests(Display *dpy, picture_info *win)
 	int num_dests;
 	picture_info *dests, *pictures_1x1, *pictures_10x10, picture_3x3, *pictures_solid;
 	int success_mask = 0, tests_passed = 0, tests_total = 0;
+	int num_tests;
 
 	create_formats_list(dpy);
 
@@ -412,17 +413,19 @@ do {								\
 	tests_total++;						\
 } while (0)
 
+	num_tests = num_colors * nformats;
+
 	if (enabled_tests & TEST_FILL) {
 		Bool ok, group_ok = TRUE;
 
 		printf("Beginning testing of filling of 1x1R pictures\n");
-		for (i = 0; i < num_colors * nformats; i++) {
+		for (i = 0; i < num_tests; i++) {
 			ok = fill_test(dpy, win, &pictures_1x1[i]);
 			RECORD_RESULTS();
 		}
 
 		printf("Beginning testing of filling of 10x10 pictures\n");
-		for (i = 0; i < num_colors * nformats; i++) {
+		for (i = 0; i < num_tests; i++) {
 			ok = fill_test(dpy, win, &pictures_10x10[i]);
 			RECORD_RESULTS();
 		}
@@ -498,8 +501,8 @@ do {								\
 			printf("Beginning %s blend test on %s\n", ops[i].name,
 			    pi->name);
 
-			for (src = 0; src < num_colors * nformats; src++) {
-				for (dst = 0; dst < num_colors; dst++) {
+			for (src = 0; src < num_tests; src++) {
+				for (dst = 0; dst < num_tests; dst++) {
 					ok = blend_test(dpy, win, pi, i,
 					    &pictures_1x1[src],
 					    &pictures_1x1[dst]);
@@ -539,9 +542,9 @@ do {								\
 			printf("Beginning %s composite mask test on %s\n",
 			    ops[i].name, pi->name);
 
-			for (src = 0; src < num_colors; src++) {
-			    for (mask = 0; mask < num_colors; mask++) {
-				for (dst = 0; dst < num_colors; dst++) {
+			for (src = 0; src < num_tests; src++) {
+			    for (mask = 0; mask < num_tests; mask++) {
+				for (dst = 0; dst < num_tests; dst++) {
 					ok = composite_test(dpy, win, pi, i,
 					    &pictures_10x10[src],
 					    &pictures_10x10[mask],
@@ -588,9 +591,9 @@ do {								\
 			printf("Beginning %s composite CA mask test on %s\n",
 			    ops[i].name, pi->name);
 
-			for (src = 0; src < num_colors; src++) {
-			    for (mask = 0; mask < num_colors; mask++) {
-				for (dst = 0; dst < num_colors; dst++) {
+			for (src = 0; src < num_tests; src++) {
+			    for (mask = 0; mask < num_tests; mask++) {
+				for (dst = 0; dst < num_tests; dst++) {
 					ok = composite_test(dpy, win, pi, i,
 					    &pictures_10x10[src],
 					    &pictures_10x10[mask],
@@ -637,8 +640,8 @@ do {								\
                     printf("Beginning %s linear gradient test on %s\n",
                            ops[i].name, pi->name);
                     
-                    for (src = 0; src < num_colors; src++) {
-                        for (mask = 0; mask < num_colors; mask++) {
+                    for (src = 0; src < num_tests; src++) {
+                        for (mask = 0; mask < num_tests; mask++) {
                             ok = linear_gradient_test(dpy, win, pi, i,
 				&pictures_1x1[dst]);
 			    RECORD_RESULTS();
