@@ -9,3 +9,4 @@ Tests currently include:
   repeating Pictures and 10x10 Pictures.
 - Linear gradients
 - Repeating sources/masks at POT and non-POT sizes
+- Some regression tests for bugs from freedesktop.org bugzilla.

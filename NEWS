@@ -1,3 +1,9 @@
+2006-11-27:
+	Version 1.2 released
+	Adds test for bug #7366
+	Tests against more picture formats.
+	Allows testing against a subset of the operators and formats.
+
 2006-05-22:
 	Version 1.1 released.
 	Adds tests for triangles, gradients, and repeating sources.

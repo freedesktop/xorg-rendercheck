@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.57)
 AC_INIT([rendercheck],
-        1.1,
+        1.2,
         [anholt@FreeBSD.org],
         rendercheck)
 
