@@ -118,15 +118,16 @@ get_pixel(Display *dpy, picture_info *pi, int x, int y, color4d *color)
 	XImage *image;
 	unsigned long val;
 	unsigned long rm, gm, bm, am;
+	XRenderDirectFormat *layout = &pi->format->direct;
 
 	image = XGetImage(dpy, pi->d, x, y, 1, 1, 0xffffffff, ZPixmap);
 
-	val = *(unsigned long *)image->data;
+	val = XGetPixel(image, 0, 0);
 
-	rm = pi->format->direct.redMask << pi->format->direct.red;
-	gm = pi->format->direct.greenMask << pi->format->direct.green;
-	bm = pi->format->direct.blueMask << pi->format->direct.blue;
-	am = pi->format->direct.alphaMask << pi->format->direct.alpha;
+	rm = (unsigned long)layout->redMask << layout->red;
+	gm = (unsigned long)layout->greenMask << layout->green;
+	bm = (unsigned long)layout->blueMask << layout->blue;
+	am = (unsigned long)layout->alphaMask << layout->alpha;
 	if (am != 0)
 		color->a = (double)(val & am) / (double)am;
 	else
