@@ -202,7 +202,7 @@ argb_fill(Display *dpy, picture_info *p, int x, int y, int w, int h, float a,
  * us get more formats than just the standard required set, and lets us attach
  * names to them.
  */
-void
+static void
 create_formats_list(Display *dpy)
 {
     int i;

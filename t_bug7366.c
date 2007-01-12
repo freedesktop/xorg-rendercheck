@@ -26,7 +26,7 @@
 
 #include "rendercheck.h"
 
-int
+static int
 expecting_error(Display *dpy, XErrorEvent *event)
 {
     return TRUE;
