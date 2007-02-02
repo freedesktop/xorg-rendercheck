@@ -436,9 +436,12 @@ do {								\
 		Bool ok, group_ok = TRUE;
 
 		printf("Beginning dest coords test\n");
-		ok = dstcoords_test(dpy, win, &dests[0], argb32white,
-		    argb32red);
-		RECORD_RESULTS();
+		for (i = 0; i < 2; i++) {
+			ok = dstcoords_test(dpy, win,
+			    i == 0 ? PictOpSrc : PictOpOver, win,
+			    argb32white, argb32red);
+			RECORD_RESULTS();
+		}
 		if (group_ok)
 			success_mask |= TEST_DSTCOORDS;
 	}
