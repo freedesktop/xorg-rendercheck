@@ -472,6 +472,10 @@ do {								\
 		printf("Beginning transformed src coords test\n");
 		ok = trans_coords_test(dpy, win, argb32white, FALSE);
 		RECORD_RESULTS();
+
+		printf("Beginning transformed src coords test 2\n");
+		ok = trans_srccoords_test_2(dpy, win, argb32white, FALSE);
+		RECORD_RESULTS();
 		if (group_ok)
 			success_mask |= TEST_TSRCCOORDS;
 	}
@@ -482,6 +486,11 @@ do {								\
 		printf("Beginning transformed mask coords test\n");
 		ok = trans_coords_test(dpy, win, argb32white, TRUE);
 		RECORD_RESULTS();
+
+		printf("Beginning transformed mask coords test 2\n");
+		ok = trans_srccoords_test_2(dpy, win, argb32white, TRUE);
+		RECORD_RESULTS();
+
 		if (group_ok)
 			success_mask |= TEST_TMASKCOORDS;
 	}
