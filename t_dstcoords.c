@@ -28,11 +28,13 @@
 #define TEST_HEIGHT	10
 
 /* Test destination coordinates by drawing a 3x3 picture offset one pixel.
- * XXX: This should be done with another operation, to catch issues with Render
- * acceleration in the non-CopyArea-equivalent case.
+ *
+ * Note: fg must have solid 1.0 alpha, but still have an alpha channel.
+ * Otherwise, we're likely to hit a path that maps PictOpOver -> PictOpSrc,
+ * for example.
  */
 Bool
-dstcoords_test(Display *dpy, picture_info *win, picture_info *dst,
+dstcoords_test(Display *dpy, picture_info *win, int op, picture_info *dst,
     picture_info *bg, picture_info *fg)
 {
 	color4d expected, tested;
@@ -42,19 +44,20 @@ dstcoords_test(Display *dpy, picture_info *win, picture_info *dst,
 	for (i = 0; i < pixmap_move_iter; i++) {
 		XRenderComposite(dpy, PictOpSrc, bg->pict, 0, dst->pict, 0, 0,
 		    0, 0, 0, 0, TEST_WIDTH, TEST_HEIGHT);
-		XRenderComposite(dpy, PictOpSrc, fg->pict, 0, dst->pict, 0, 0,
-		    0, 0, 1, 1, 1, 1);
+		XRenderComposite(dpy, op, fg->pict, 0, dst->pict, 0, 0,
+		    0, 0, 1, 1, 3, 3);
 	}
 
 	copy_pict_to_win(dpy, dst, win, TEST_WIDTH, TEST_HEIGHT);
 
-	for (x = 0; x < 3; x++) {
-		for (y = 0; y < 3; y++) {
+	for (x = 0; x < 5; x++) {
+		for (y = 0; y < 5; y++) {
 			get_pixel(dpy, dst, x, y, &tested);
-			if (x == 1 && y == 1)
+			if ((x >= 1 && x <= 3) && (y >= 1 && y <= 3))
 				expected = fg->color;
 			else
 				expected = bg->color;
+
 			color_correct(dst, &expected);
 			if (!eval_diff("dst coords", &expected, &tested, x, y,
 			    is_verbose))

@@ -15,6 +15,7 @@ rendercheck_SOURCES = \
 	t_repeat.c \
 	t_srccoords.c \
 	t_tsrccoords.c \
+	t_tsrccoords2.c \
 	t_triangles.c
 
 INCLUDES = $(RC_CFLAGS)

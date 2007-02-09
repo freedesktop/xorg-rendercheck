@@ -118,15 +118,16 @@ get_pixel(Display *dpy, picture_info *pi, int x, int y, color4d *color)
 	XImage *image;
 	unsigned long val;
 	unsigned long rm, gm, bm, am;
+	XRenderDirectFormat *layout = &pi->format->direct;
 
 	image = XGetImage(dpy, pi->d, x, y, 1, 1, 0xffffffff, ZPixmap);
 
-	val = *(unsigned long *)image->data;
+	val = XGetPixel(image, 0, 0);
 
-	rm = pi->format->direct.redMask << pi->format->direct.red;
-	gm = pi->format->direct.greenMask << pi->format->direct.green;
-	bm = pi->format->direct.blueMask << pi->format->direct.blue;
-	am = pi->format->direct.alphaMask << pi->format->direct.alpha;
+	rm = (unsigned long)layout->redMask << layout->red;
+	gm = (unsigned long)layout->greenMask << layout->green;
+	bm = (unsigned long)layout->blueMask << layout->blue;
+	am = (unsigned long)layout->alphaMask << layout->alpha;
 	if (am != 0)
 		color->a = (double)(val & am) / (double)am;
 	else
@@ -202,7 +203,7 @@ argb_fill(Display *dpy, picture_info *p, int x, int y, int w, int h, float a,
  * us get more formats than just the standard required set, and lets us attach
  * names to them.
  */
-void
+static void
 create_formats_list(Display *dpy)
 {
     int i;
@@ -435,9 +436,12 @@ do {								\
 		Bool ok, group_ok = TRUE;
 
 		printf("Beginning dest coords test\n");
-		ok = dstcoords_test(dpy, win, &dests[0], argb32white,
-		    argb32red);
-		RECORD_RESULTS();
+		for (i = 0; i < 2; i++) {
+			ok = dstcoords_test(dpy, win,
+			    i == 0 ? PictOpSrc : PictOpOver, win,
+			    argb32white, argb32red);
+			RECORD_RESULTS();
+		}
 		if (group_ok)
 			success_mask |= TEST_DSTCOORDS;
 	}
@@ -468,6 +472,10 @@ do {								\
 		printf("Beginning transformed src coords test\n");
 		ok = trans_coords_test(dpy, win, argb32white, FALSE);
 		RECORD_RESULTS();
+
+		printf("Beginning transformed src coords test 2\n");
+		ok = trans_srccoords_test_2(dpy, win, argb32white, FALSE);
+		RECORD_RESULTS();
 		if (group_ok)
 			success_mask |= TEST_TSRCCOORDS;
 	}
@@ -478,6 +486,11 @@ do {								\
 		printf("Beginning transformed mask coords test\n");
 		ok = trans_coords_test(dpy, win, argb32white, TRUE);
 		RECORD_RESULTS();
+
+		printf("Beginning transformed mask coords test 2\n");
+		ok = trans_srccoords_test_2(dpy, win, argb32white, TRUE);
+		RECORD_RESULTS();
+
 		if (group_ok)
 			success_mask |= TEST_TMASKCOORDS;
 	}

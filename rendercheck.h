@@ -136,7 +136,7 @@ composite_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     Bool componentAlpha, Bool print_errors);
 
 Bool
-dstcoords_test(Display *dpy, picture_info *win, picture_info *dst,
+dstcoords_test(Display *dpy, picture_info *win, int op, picture_info *dst,
     picture_info *bg, picture_info *fg);
 
 Bool
@@ -148,6 +148,10 @@ srccoords_test(Display *dpy, picture_info *win, picture_info *white,
 
 Bool
 trans_coords_test(Display *dpy, picture_info *win, picture_info *white,
+    Bool test_mask);
+
+Bool
+trans_srccoords_test_2(Display *dpy, picture_info *win, picture_info *white,
     Bool test_mask);
 
 Bool linear_gradient_test(Display *dpy, picture_info *win,
