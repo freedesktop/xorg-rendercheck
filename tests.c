@@ -637,6 +637,10 @@ do {								\
         if (enabled_tests & TEST_GRADIENTS) {
 	    Bool ok, group_ok = TRUE;
 
+	    printf("Beginning render to linear gradient test\n");
+	    ok = render_to_gradient_test(dpy, &pictures_1x1[0]);
+	    RECORD_RESULTS();
+
             for (i = 0; i < num_ops; i++) {
 		if (ops[i].disabled)
 		    continue;

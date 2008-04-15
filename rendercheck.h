@@ -155,6 +155,8 @@ Bool
 trans_srccoords_test_2(Display *dpy, picture_info *win, picture_info *white,
     Bool test_mask);
 
+Bool render_to_gradient_test(Display *dpy, picture_info *src);
+
 Bool linear_gradient_test(Display *dpy, picture_info *win,
                           picture_info *dst, int op, picture_info *dst_color);
 

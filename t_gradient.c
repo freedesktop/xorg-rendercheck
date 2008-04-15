@@ -87,6 +87,78 @@ static const pixel test_pixels [] = {
 
 const int n_linear_gradient_points = sizeof(linear_gradient_points)/(2*sizeof(point));
 
+static Bool got_bad_drawable;
+
+static int expecting_bad_drawable(Display *dpy, XErrorEvent *event)
+{
+	if (event->error_code == BadDrawable)
+		got_bad_drawable = TRUE;
+
+	return TRUE;
+}
+
+
+/* Tests that rendering to a linear gradient returns an error as expected.
+ */
+Bool
+render_to_gradient_test(Display *dpy, picture_info *src)
+{
+	XLinearGradient g;
+	Picture gradient;
+	XFixed stops[10];
+	XRenderColor colors[10];
+	const stop *stps = &stop_list[0][0];
+	int i, p = 0;
+
+	g.p1.x = XDoubleToFixed(linear_gradient_points[p].x);
+	g.p1.y = XDoubleToFixed(linear_gradient_points[p].y);
+	g.p2.x = XDoubleToFixed(linear_gradient_points[p+1].x);
+	g.p2.y = XDoubleToFixed(linear_gradient_points[p+1].y);
+	for (i = 0; i < 10; ++i) {
+                if (stps[i].x < 0)
+			break;
+                stops[i] = XDoubleToFixed(stps[i].x);
+                colors[i].red = stps[i].color.r*65535;
+                colors[i].green = stps[i].color.g*65535;
+                colors[i].blue = stps[i].color.b*65535;
+                colors[i].alpha = stps[i].color.a*65535;
+	}
+	gradient = XRenderCreateLinearGradient(dpy, &g, stops, colors, i);
+
+	/* Clear out any failing requests before our expected to fail ones. */
+	XSync(dpy, FALSE);
+
+	got_bad_drawable = FALSE;
+	XSetErrorHandler(expecting_bad_drawable);
+
+	/* Try a real compositing path */
+	XRenderComposite(dpy, PictOpOver, src->pict, 0, gradient,
+			 0, 0, 0, 0, 0, 0, win_width, win_height);
+	XSync(dpy, FALSE);
+	if (!got_bad_drawable) {
+		printf("render_to_gradient: Failed to get BadDrawable with "
+		       "Over\n");
+		return FALSE;
+	} else {
+		got_bad_drawable = FALSE;
+	}
+
+	/* Try the copy path to catch bad short-circuiting to 2d. */
+	XRenderComposite(dpy, PictOpSrc, src->pict, 0, gradient,
+			 0, 0, 0, 0, 0, 0, win_width, win_height);
+	XSync(dpy, FALSE);
+	if (!got_bad_drawable) {
+		printf("render_to_gradient: Failed to get BadDrawable with "
+		       "Src\n");
+		return FALSE;
+	} else {
+		got_bad_drawable = FALSE;
+	}
+	XSetErrorHandler(NULL);
+
+	XRenderFreePicture(dpy, gradient);
+}
+
 static void gradientPixel(const stop *stops, double pos, unsigned int spread, color4d *result)
 {
     const int PRECISION = 1<<16;
