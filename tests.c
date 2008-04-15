@@ -652,11 +652,9 @@ do {								\
                            ops[i].name, pi->name);
                     
                     for (src = 0; src < num_tests; src++) {
-                        for (mask = 0; mask < num_tests; mask++) {
-                            ok = linear_gradient_test(dpy, win, pi, i,
-				&pictures_1x1[dst]);
-			    RECORD_RESULTS();
-                        }
+			ok = linear_gradient_test(dpy, win, pi, i,
+						  &pictures_1x1[src]);
+			RECORD_RESULTS();
                     }
                 }
             }

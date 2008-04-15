@@ -211,6 +211,7 @@ Bool linear_gradient_test(Display *dpy, picture_info *win,
 		pa.repeat = repeat;
 		XRenderChangePicture(dpy, gradient, CPRepeat, &pa);
 
+		assert (dst_color->pict > 100);
                 XRenderComposite(dpy, PictOpSrc, dst_color->pict, 0, dst->pict, 0, 0,
                                  0, 0, 0, 0, win_width, win_height);
                 XRenderComposite(dpy, ops[op].op, gradient, 0,

@@ -20,6 +20,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <X11/Xlib.h>
 #include <X11/extensions/Xrender.h>
 
 #if HAVE_ERR_H
