@@ -393,8 +393,8 @@ do_tests(Display *dpy, picture_info *win)
 
         pictures_solid = malloc(num_colors * sizeof(picture_info));
 	for (i = 0; i < num_colors; i++) {
-            pictures_solid[i].color = colors[i];
             XRenderColor c;
+            pictures_solid[i].color = colors[i];
             c.alpha = (int)(colors[i].a*65535);
             c.red = (int)(colors[i].r*65535);
             c.green = (int)(colors[i].g*65535);

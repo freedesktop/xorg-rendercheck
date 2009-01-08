@@ -157,6 +157,8 @@ render_to_gradient_test(Display *dpy, picture_info *src)
 	XSetErrorHandler(NULL);
 
 	XRenderFreePicture(dpy, gradient);
+
+	return TRUE;
 }
 
 static void gradientPixel(const stop *stops, double pos, unsigned int spread, color4d *result)
