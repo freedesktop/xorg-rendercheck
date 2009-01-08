@@ -108,7 +108,7 @@ usage (char *program)
 {
     fprintf(stderr, "usage: %s [-d|--display display] [-v|--verbose]\n"
 	"\t[-t test1,test2,...] [-o op1,op2,...] [-f format1,format2,...]\n"
-	"\t[--sync] [--minimalrendering]\n"
+	"\t[--sync] [--minimalrendering] [--version]\n"
             "\tAvailable tests: fill,dcoords,scoords,mcoords,tscoords,\n"
             "\t\ttmcoords,blend,composite,cacomposite,gradients,repeat,triangles,\n"
             "\t\tbug7366\n",
@@ -121,7 +121,7 @@ int main(int argc, char **argv)
 	Display *dpy;
 	XEvent ev;
 	int i, o, maj, min;
-	static int is_sync = 0;
+	static Bool is_sync = FALSE, print_version = FALSE;
 	XWindowAttributes a;
 	XSetWindowAttributes as;
 	picture_info window;
@@ -135,9 +135,10 @@ int main(int argc, char **argv)
 		{ "tests",	required_argument,	NULL,	't' },
 		{ "ops",	required_argument,	NULL,	'o' },
 		{ "verbose",	no_argument,		NULL,	'v' },
-		{ "sync",	no_argument,		&is_sync, 1},
+		{ "sync",	no_argument,		&is_sync, TRUE},
 		{ "minimalrendering", no_argument,	&minimalrendering,
 		    TRUE},
+		{ "version",	no_argument,		&print_version, TRUE },
 		{ NULL,		0,			NULL,	0 }
 	};
 
@@ -238,6 +239,13 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
+
+	/* Print the version string.  Bail out if --version was requested and
+	 * continue otherwise.
+	 */
+	puts(PACKAGE_STRING);
+	if (print_version)
+		return 0;
 
 	dpy = XOpenDisplay(display);
 	if (dpy == NULL)
