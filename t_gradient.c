@@ -55,7 +55,7 @@ static const stop stop_list[][10] = {
         { -1, {0, 0, 0, 0} }
     }
 };
-const int n_stop_list = sizeof(stop_list)/(10*sizeof(stop));
+static const int n_stop_list = sizeof(stop_list)/(10*sizeof(stop));
 
 typedef struct _point {
     double x;
@@ -85,7 +85,7 @@ static const pixel test_pixels [] = {
     {-1, -1}
 };
 
-const int n_linear_gradient_points = sizeof(linear_gradient_points)/(2*sizeof(point));
+static const int n_linear_gradient_points = sizeof(linear_gradient_points)/(2*sizeof(point));
 
 static Bool got_bad_drawable;
 
@@ -303,7 +303,7 @@ Bool linear_gradient_test(Display *dpy, picture_info *win,
 
                     tdst = dst_color->color;
                     color_correct(dst, &tdst);
-                    do_composite(ops[op].op, &tgradient, 0, &tdst,
+                    do_composite(ops[op].op, &tgradient, NULL, &tdst,
                                  &expected, False);
                     color_correct(dst, &expected);
 

@@ -27,9 +27,9 @@
 
 #include "rendercheck.h"
 
-XRenderPictFormat **format_list;
-int nformats;
-int argb32index;
+static XRenderPictFormat **format_list;
+static int nformats;
+static int argb32index;
 
 /* Note: changing the order of these colors may disrupt tests that depend on
  * specific colors.  Just add to the end if you need.  These are

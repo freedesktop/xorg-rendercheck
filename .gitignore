@@ -15,3 +15,6 @@ mkinstalldirs
 rendercheck
 *.o
 *~
+ChangeLog
+rendercheck-*.tar.*
+tags

@@ -91,6 +91,8 @@ extern int enabled_tests;
 extern int format_whitelist_len;
 extern char **format_whitelist;
 extern picture_info *argb32white, *argb32red, *argb32green, *argb32blue;
+extern int num_ops;
+extern int num_colors;
 
 /* main.c */
 void

@@ -279,7 +279,7 @@ int main(int argc, char **argv)
 	XGetWindowAttributes(dpy, window.d, &a);
 	window.format = XRenderFindVisualFormat(dpy, a.visual);
 	window.pict = XRenderCreatePicture(dpy, window.d,
-	    window.format, 0, 0);
+	    window.format, 0, NULL);
 	window.name = (char *)malloc(20);
 	if (window.name == NULL)
 		errx(1, "malloc error");

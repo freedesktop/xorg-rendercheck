@@ -12,8 +12,17 @@ AM_INIT_AUTOMAKE([dist-bzip2])
 
 AM_MAINTAINER_MODE
 
-# Checks for programs.
+# Require xorg-macros: XORG_CWARNFLAGS, XORG_CHANGELOG
+m4_ifndef([XORG_MACROS_VERSION], [AC_FATAL([must install xorg-macros 1.2 or later before running autoconf/autogen])])
+XORG_MACROS_VERSION(1.2)
+
 AC_PROG_CC
+
+XORG_CWARNFLAGS
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([err.h])
 
 AC_ARG_ENABLE(werror,        AS_HELP_STRING([--enable-werror],
 				  [Treat warnings as errors (default: disabled)]),
@@ -36,24 +45,13 @@ then
 	RC_LIBS="$X_LIBS -lXrender -lXext -lX11"
 fi
 
-if test "x$GCC" = "xyes"; then
-       GCC_WARNINGS1="-Wall -Wpointer-arith -Wstrict-prototypes"
-       GCC_WARNINGS2="-Wmissing-prototypes -Wmissing-declarations"
-       GCC_WARNINGS3="-Wnested-externs -fno-strict-aliasing"
-       GCC_WARNINGS="$GCC_WARNINGS1 $GCC_WARNINGS2 $GCC_WARNINGS3"
-       if test "x$WERROR" = "xyes"; then
-               GCC_WARNINGS="${GCC_WARNINGS} -Werror"
-       fi
-       RC_CFLAGS="$RC_CFLAGS $GCC_WARNINGS"
+if test "x$GCC" = "xyes" -a "x$WERROR" = "xyes"; then
+	CWARNFLAGS="$CWARNFLAGS -Werror"
 fi
-
+RC_CFLAGS="$CWARNFLAGS $RC_CFLAGS"
 AC_SUBST(RC_CFLAGS)
 AC_SUBST(RC_LIBS)
 
-# Checks for libraries.
-
-# Checks for header files.
-AC_HEADER_STDC
-AC_CHECK_HEADERS([err.h])
+XORG_CHANGELOG
 
 AC_OUTPUT([Makefile])
