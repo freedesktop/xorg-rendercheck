@@ -28,7 +28,6 @@ EXTRA_DIST = \
 	README \
 	doc/AddingNewTests \
 	doc/TODO \
-	autogen.sh \
 	${man_MANS}
 
 EXTRA_DIST += ChangeLog
