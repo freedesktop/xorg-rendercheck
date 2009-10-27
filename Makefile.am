@@ -30,8 +30,6 @@ EXTRA_DIST = \
 	doc/TODO \
 	${man_MANS}
 
-EXTRA_DIST += ChangeLog
-MAINTAINERCLEANFILES = ChangeLog
 
 .PHONY: ChangeLog
 
