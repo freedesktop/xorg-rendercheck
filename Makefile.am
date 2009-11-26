@@ -21,6 +21,7 @@ rendercheck_SOURCES = \
 INCLUDES = $(RC_CFLAGS)
 rendercheck_LDADD = $(RC_LIBS)
 
+MAINTAINERCLEANFILES = ChangeLog INSTALL
 EXTRA_DIST = \
 	AUTHORS \
 	COPYING \
@@ -28,6 +29,7 @@ EXTRA_DIST = \
 	README \
 	doc/AddingNewTests \
 	doc/TODO \
+        autogen.sh \
 	${man_MANS}
 
 
