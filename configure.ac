@@ -47,9 +47,8 @@ then
 fi
 
 if test "x$GCC" = "xyes" -a "x$WERROR" = "xyes"; then
-	CWARNFLAGS="$CWARNFLAGS -Werror"
+	RC_CFLAGS="$RC_CFLAGS -Werror"
 fi
-RC_CFLAGS="$CWARNFLAGS $RC_CFLAGS"
 AC_SUBST(RC_CFLAGS)
 AC_SUBST(RC_LIBS)
 

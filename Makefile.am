@@ -18,7 +18,7 @@ rendercheck_SOURCES = \
 	t_tsrccoords2.c \
 	t_triangles.c
 
-INCLUDES = $(RC_CFLAGS)
+AM_CFLAGS = $(RC_CFLAGS) $(CWARNFLAGS)
 rendercheck_LDADD = $(RC_LIBS)
 
 MAINTAINERCLEANFILES = ChangeLog INSTALL
