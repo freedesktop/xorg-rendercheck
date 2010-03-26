@@ -19,6 +19,7 @@ XORG_MACROS_VERSION(1.3)
 XORG_DEFAULT_OPTIONS
 
 AC_PROG_CC
+AC_PROG_SED
 
 
 # Checks for header files.
@@ -52,5 +53,7 @@ fi
 AC_SUBST(RC_CFLAGS)
 AC_SUBST(RC_LIBS)
 
+AC_CONFIG_FILES([Makefile
+                 man/Makefile])
 
-AC_OUTPUT([Makefile])
+AC_OUTPUT

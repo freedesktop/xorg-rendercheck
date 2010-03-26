@@ -1,5 +1,6 @@
+SUBDIRS = man
+
 bin_PROGRAMS = rendercheck
-man_MANS = rendercheck.1
 
 rendercheck_SOURCES = \
 	main.c \
@@ -29,9 +30,7 @@ EXTRA_DIST = \
 	README \
 	doc/AddingNewTests \
 	doc/TODO \
-        autogen.sh \
-	${man_MANS}
-
+        autogen.sh
 
 .PHONY: ChangeLog INSTALL
 
