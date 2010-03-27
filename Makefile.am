@@ -24,10 +24,6 @@ rendercheck_LDADD = $(RC_LIBS)
 
 MAINTAINERCLEANFILES = ChangeLog INSTALL
 EXTRA_DIST = \
-	AUTHORS \
-	COPYING \
-	INSTALL \
-	README \
 	doc/AddingNewTests \
 	doc/TODO \
         autogen.sh
