@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.57)
+AC_PREREQ(2.60)
 AC_INIT([rendercheck],
         1.3,
         [anholt@FreeBSD.org],
