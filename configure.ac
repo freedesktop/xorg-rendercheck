@@ -3,9 +3,9 @@
 
 AC_PREREQ(2.60)
 AC_INIT([rendercheck],
-        1.3,
-        [anholt@FreeBSD.org],
-        rendercheck)
+        [1.4],
+        [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],
+        [rendercheck])
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
