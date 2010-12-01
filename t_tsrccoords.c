@@ -25,6 +25,9 @@
 
 #include "rendercheck.h"
 
+#define TEST_WIDTH 40
+#define TEST_HEIGHT 40
+
 static int dot_colors[5][5] = {
 	{7, 7, 7, 7, 7},
 	{7, 7, 7, 7, 7},
@@ -48,7 +51,7 @@ static picture_info *create_dot_picture(Display *dpy)
 	for (i = 0; i < 25; i++) {
 		int x = i % 5;
 		int y = i / 5;
-		color4d *c = &colors[dot_colors[x][y]];
+		color4d *c = &colors[dot_colors[y][x]];
 
 		argb_fill(dpy, p, x, y, 1, 1, c->a, c->r, c->g, c->b);
 	}
@@ -79,11 +82,12 @@ trans_coords_test(Display *dpy, picture_info *win, picture_info *white,
     Bool test_mask)
 {
 	color4d tested;
-	int x, y;
 	Bool failed = FALSE;
-	int tested_colors[40][40], expected_colors[40][40];
+	int tested_colors[TEST_HEIGHT][TEST_WIDTH], expected_colors[TEST_HEIGHT][TEST_WIDTH];
 	XTransform t;
 	picture_info *src;
+	XImage *image;
+	int x, y;
 
 	src = create_dot_picture(dpy);
 	if (src == NULL) {
@@ -98,31 +102,35 @@ trans_coords_test(Display *dpy, picture_info *win, picture_info *white,
 
 	if (!test_mask)
 		XRenderComposite(dpy, PictOpSrc, src->pict, 0,
-		    win->pict, 0, 0, 0, 0, 0, 0, 40, 40);
+		    win->pict, 0, 0, 0, 0, 0, 0, TEST_WIDTH, TEST_HEIGHT);
 	else {
 		XRenderComposite(dpy, PictOpSrc, white->pict, src->pict,
-		    win->pict, 0, 0, 0, 0, 0, 0, 40, 40);
+		    win->pict, 0, 0, 0, 0, 0, 0, TEST_WIDTH, TEST_HEIGHT);
 	}
 
-	for (x = 0; x < 40; x++) {
-	    for (y = 0; y < 40; y++) {
+	image = XGetImage(dpy, win->d,
+			  0, 0, TEST_WIDTH, TEST_HEIGHT,
+			  0xffffffff, ZPixmap);
+
+	for (y = 0; y < TEST_HEIGHT; y++) {
+		for (x = 0; x < TEST_WIDTH; x++) {
 		int src_sample_x, src_sample_y;
 
 		src_sample_x = x / 8;
 		src_sample_y = y / 8;
-		expected_colors[x][y] = dot_colors[src_sample_x][src_sample_y];
+		expected_colors[y][x] = dot_colors[src_sample_y][src_sample_x];
 
-		get_pixel(dpy, win, x, y, &tested);
+		get_pixel_from_image(image, win, x, y, &tested);
 
 		if (tested.r == 1.0 && tested.g == 1.0 && tested.b == 1.0) {
-			tested_colors[x][y] = 0;
+			tested_colors[y][x] = 0;
 		} else if (tested.r == 0.0 && tested.g == 0.0 &&
 		    tested.b == 0.0) {
-			tested_colors[x][y] = 7;
+			tested_colors[y][x] = 7;
 		} else {
-			tested_colors[x][y] = 9;
+			tested_colors[y][x] = 9;
 		}
-		if (tested_colors[x][y] != expected_colors[x][y])
+		if (tested_colors[y][x] != expected_colors[y][x])
 			failed = TRUE;
 	    }
 	}
@@ -131,21 +139,22 @@ trans_coords_test(Display *dpy, picture_info *win, picture_info *white,
 		printf("%s transform coordinates test failed.\n",
 		    test_mask ? "mask" : "src");
 		printf("expected vs tested:\n");
-		for (y = 0; y < 40; y++) {
-			for (x = 0; x < 40; x++)
-				printf("%d", expected_colors[x][y]);
+		for (y = 0; y < TEST_HEIGHT; y++) {
+			for (x = 0; x < TEST_WIDTH; x++)
+				printf("%d", expected_colors[y][x]);
 			printf(" ");
-			for (x = 0; x < 40; x++)
-				printf("%d", tested_colors[x][y]);
+			for (x = 0; x < TEST_WIDTH; x++)
+				printf("%d", tested_colors[y][x]);
 			printf("\n");
 		}
 		printf(" vs tested (same)\n");
-		for (y = 0; y < 40; y++) {
-			for (x = 0; x < 40; x++)
-				printf("%d", tested_colors[x][y]);
+		for (y = 0; y < TEST_HEIGHT; y++) {
+			for (x = 0; x < TEST_WIDTH; x++)
+				printf("%d", tested_colors[y][x]);
 			printf("\n");
 		}
 	}
+	XDestroyImage(image);
 
 	init_transform(&t);
 
