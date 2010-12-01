@@ -81,6 +81,7 @@ trans_srccoords_test_2(Display *dpy, picture_info *win, picture_info *white,
 	int tested_colors[5][5];
 	picture_info *src;
 	XTransform t;
+	XImage *image;
 
 	src = create_target_picture(dpy);
 	if (src == NULL) {
@@ -120,10 +121,14 @@ trans_srccoords_test_2(Display *dpy, picture_info *win, picture_info *white,
 		    &pa);
 	}
 
+	image = XGetImage(dpy, win->d,
+			  0, 0, 5, 5,
+			  0xffffffff, ZPixmap);
+
 	for (i = 0; i < 25; i++) {
 		int x = i % 5, y = i / 5, srcx, srcy;
 
-		get_pixel(dpy, win, x, y, &tested);
+		get_pixel_from_image(image, win, x, y, &tested);
 
 		/* Map from our destination coordinates to where they are
 		 * in the source picture.  Rotate right.
@@ -166,6 +171,7 @@ trans_srccoords_test_2(Display *dpy, picture_info *win, picture_info *white,
 		}
 	}
 
+	XDestroyImage(image);
 	destroy_target_picture(dpy, src);
 
 	return !failed;
