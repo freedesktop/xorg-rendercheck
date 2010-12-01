@@ -3,4 +3,3 @@
 - Check coordinates for more different transformations
 - Check source/mask pixels falling outside the drawable.
 - Check trapezoids!
-- get_pixel equivalent that doesn't involve round-trips per call.
