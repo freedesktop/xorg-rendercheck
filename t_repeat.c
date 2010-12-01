@@ -50,7 +50,6 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     picture_info *dst_color, picture_info *c1, picture_info *c2, Bool test_mask)
 {
 	int wi, hi;
-	Bool failed = FALSE;
 
 	for (wi = 0; wi < sizeof(sizes) / sizeof(int); wi++) {
 	    int w = sizes[wi];
@@ -64,6 +63,8 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		color4d tdst, c1expected, c2expected;
 		XRenderPictureAttributes pa;
 		XRenderDirectFormat acc;
+		XImage *image;
+		Bool failed = FALSE;
 
 		pa.component_alpha = test_mask;
 		pa.repeat = TRUE;
@@ -129,8 +130,12 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		color_correct(dst, &c1expected);
 		color_correct(dst, &c2expected);
 
-		for (x = 0; x < TEST_WIDTH; x++) {
-		    for (y = 0; y < TEST_HEIGHT; y++) {
+		image = XGetImage(dpy, dst->d,
+				  0, 0, TEST_WIDTH, TEST_HEIGHT,
+				  ~0U, ZPixmap);
+
+		for (y = 0; y < TEST_HEIGHT; y++) {
+		    for (x = 0; x < TEST_WIDTH; x++) {
 			int samplex = x % w;
 			int sampley = y % h;
 			color4d *expected, tested;
@@ -140,7 +145,7 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 			} else {
 				expected = &c1expected;
 			}
-			get_pixel(dpy, dst, x, y, &tested);
+			get_pixel_from_image(image, dst, x, y, &tested);
 
 			if (eval_diff(&acc, expected, &tested) > 3.) {
 			    snprintf(name, 40, "%dx%d %s %s-repeat", w, h,
@@ -148,13 +153,20 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 
 			    print_fail(name, expected, &tested, x, y,
 				       eval_diff(&acc, expected, &tested));
-				failed = TRUE;
+
+			    failed = TRUE;
+			    goto out;
 			}
 		    }
 		}
+out:
+		XDestroyImage(image);
 		XRenderFreePicture(dpy, src.pict);
 		XFreePixmap(dpy, src.d);
+
+		if (failed)
+		    return FALSE;
 	    }
 	}
-	return !failed;
+	return TRUE;
 }
