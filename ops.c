@@ -205,8 +205,12 @@ calc_op(int op, double src, double dst, double srca, double dsta)
 }
 
 void
-do_composite(int op, color4d *src, color4d *mask, color4d *dst, color4d *result,
-    Bool componentAlpha)
+do_composite(int op,
+	     const color4d *src,
+	     const color4d *mask,
+	     const color4d *dst,
+	     color4d *result,
+	     Bool componentAlpha)
 {
 	color4d srcval, srcalpha;
 

@@ -41,7 +41,7 @@ char **format_whitelist;
 int pixmap_move_iter = 1;
 
 int win_width = 40;
-int win_height = 40;
+int win_height = 200;
 
 int
 bit_count(int i)

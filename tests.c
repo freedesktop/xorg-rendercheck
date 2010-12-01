@@ -113,16 +113,16 @@ color_correct(picture_info *pi, color4d *color)
 }
 
 void
-get_pixel(Display *dpy, picture_info *pi, int x, int y, color4d *color)
+get_pixel_from_image(XImage *image,
+		     const picture_info *pi,
+		     int x, int y,
+		     color4d *color)
 {
-	XImage *image;
 	unsigned long val;
 	unsigned long rm, gm, bm, am;
 	XRenderDirectFormat *layout = &pi->format->direct;
 
-	image = XGetImage(dpy, pi->d, x, y, 1, 1, 0xffffffff, ZPixmap);
-
-	val = XGetPixel(image, 0, 0);
+	val = XGetPixel(image, x, y);
 
 	rm = (unsigned long)layout->redMask << layout->red;
 	gm = (unsigned long)layout->greenMask << layout->green;
@@ -141,6 +141,18 @@ get_pixel(Display *dpy, picture_info *pi, int x, int y, color4d *color)
 		color->g = 0.0;
 		color->b = 0.0;
 	}
+}
+
+void
+get_pixel(Display *dpy,
+	  const picture_info *pi,
+	  int x, int y,
+	  color4d *color)
+{
+	XImage *image;
+
+	image = XGetImage(dpy, pi->d, x, y, 1, 1, 0xffffffff, ZPixmap);
+	get_pixel_from_image(image, pi, 0, 0, color);
 	XDestroyImage(image);
 }
 
@@ -497,43 +509,52 @@ do {								\
 
 	if (enabled_tests & TEST_BLEND) {
 		Bool ok, group_ok = TRUE;
+		int *blend_ops = malloc(sizeof(int)*num_ops);
+		const picture_info **blend_src = malloc(sizeof(picture_info*)*(2*num_tests+num_colors));
+		const picture_info **blend_dst = malloc(sizeof(picture_info*)*(num_tests+num_colors));
+		int num_blend_ops = 0;
+		int num_blend_src = 0;
+		int num_blend_dst = 0;
 
 		for (i = 0; i < num_ops; i++) {
 		    if (ops[i].disabled)
 			continue;
 
-		    for (j = 0; j <= num_dests; j++) {
-			picture_info *pi;
+		    blend_ops[num_blend_ops++] = i;
+		}
 
-			if (j != num_dests)
-				pi = &dests[j];
-			else
-				pi = win;
-			printf("Beginning %s blend test on %s\n", ops[i].name,
-			    pi->name);
+		for (i = 0; i < num_tests; i++) {
+		    blend_src[num_blend_src++] = &pictures_1x1[i];
+		    blend_src[num_blend_src++] = &pictures_10x10[i];
+		    blend_dst[num_blend_dst++] = &pictures_1x1[i];
+		}
+		for (i = 0; i < num_colors; i++) {
+		    blend_src[num_blend_src++] = &pictures_solid[i];
+		    blend_dst[num_blend_dst++] = &pictures_solid[i];
+		}
 
-			for (src = 0; src < num_tests; src++) {
-				for (dst = 0; dst < num_tests; dst++) {
-					ok = blend_test(dpy, win, pi, i,
-					    &pictures_1x1[src],
-					    &pictures_1x1[dst]);
-					RECORD_RESULTS();
-					ok = blend_test(dpy, win, pi, i,
-					    &pictures_10x10[src],
-					    &pictures_1x1[dst]);
-					RECORD_RESULTS();
-				}
-			}
-                        for (src = 0; src < num_colors; src++) {
-                            for (dst = 0; dst < num_colors; dst++) {
-                                ok = blend_test(dpy, win, pi, i, &pictures_solid[src], &pictures_1x1[dst]);
-				RECORD_RESULTS();
-                            }
-                        }
-		    }
+		for (j = 0; j <= num_dests; j++) {
+		    picture_info *pi;
+
+		    if (j != num_dests)
+			pi = &dests[j];
+		    else
+			pi = win;
+
+		    printf("Beginning blend test on %s\n", pi->name);
+
+		    ok = blend_test(dpy, win, pi,
+				    blend_ops, num_blend_ops,
+				    blend_src, num_blend_src,
+				    blend_dst, num_blend_dst);
+		    RECORD_RESULTS();
 		}
 		if (group_ok)
 			success_mask |= TEST_BLEND;
+
+		free(blend_ops);
+		free(blend_src);
+		free(blend_dst);
 	}
 
 	if (enabled_tests & TEST_COMPOSITE) {

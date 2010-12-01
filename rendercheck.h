@@ -106,7 +106,16 @@ void
 color_correct(picture_info *pi, color4d *color);
 
 void
-get_pixel(Display *dpy, picture_info *pi, int x, int y, color4d *color);
+get_pixel(Display *dpy,
+	  const picture_info *pi,
+	  int x, int y,
+	  color4d *color);
+
+void
+get_pixel_from_image(XImage *image,
+		     const picture_info *pi,
+		     int x, int y,
+		     color4d *color);
 
 int
 eval_diff(char *name, color4d *expected, color4d *test, int x, int y,
@@ -125,13 +134,19 @@ copy_pict_to_win(Display *dpy, picture_info *pict, picture_info *win,
 
 /* ops.c */
 void
-do_composite(int op, color4d *src, color4d *mask, color4d *dst, color4d *result,
-    Bool componentAlpha);
+do_composite(int op,
+	     const color4d *src,
+	     const color4d *mask,
+	     const color4d *dst,
+	     color4d *result,
+	     Bool componentAlpha);
 
 /* The tests */
 Bool
-blend_test(Display *dpy, picture_info *win, picture_info *dst, int op,
-    picture_info *src_color, picture_info *dst_color);
+blend_test(Display *dpy, picture_info *win, picture_info *dst,
+	   const int *op, int num_op,
+	   const picture_info **src_color, int num_src,
+	   const picture_info **dst_color, int num_dst);
 
 Bool
 composite_test(Display *dpy, picture_info *win, picture_info *dst, int op,

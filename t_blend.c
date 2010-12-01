@@ -24,51 +24,94 @@
 
 #include "rendercheck.h"
 
-#define TEST_WIDTH	10
-#define TEST_HEIGHT	10
-
-/* Test a composite of a given operation, source, and destination picture.
- * Fills the window, and samples from the 0,0 pixel corner.
- */
+/* Test a composite of a given operation, source, and destination picture.  */
 Bool
-blend_test(Display *dpy, picture_info *win, picture_info *dst, int op,
-    picture_info *src_color, picture_info *dst_color)
+blend_test(Display *dpy, picture_info *win, picture_info *dst,
+	   const int *op, int num_op,
+	   const picture_info **src_color, int num_src,
+	   const picture_info **dst_color, int num_dst)
 {
 	color4d expected, tested, tdst;
 	char testname[20];
-	int i;
+	int i, j, k, y, iter;
 
-	for (i = 0; i < pixmap_move_iter; i++) {
-		XRenderComposite(dpy, PictOpSrc, dst_color->pict, 0,
-		    dst->pict, 0, 0, 0, 0, 0, 0, TEST_WIDTH, TEST_HEIGHT);
-		XRenderComposite(dpy, ops[op].op, src_color->pict, 0,
-		    dst->pict, 0, 0, 0, 0, 0, 0, TEST_WIDTH, TEST_HEIGHT);
+	k = y = 0;
+	while (k < num_dst) {
+	    XImage *image;
+	    int k0 = k;
+
+	    for (iter = 0; iter < pixmap_move_iter; iter++) {
+		k = k0;
+		y = 0;
+		while (k < num_dst && y + num_src < win_height) {
+		    XRenderComposite(dpy, PictOpSrc,
+				     dst_color[k]->pict, 0, dst->pict,
+				     0, 0,
+				     0, 0,
+				     0, y,
+				     num_op, num_src);
+		    for (j = 0; j < num_src; j++) {
+			for (i = 0; i < num_op; i++) {
+			    XRenderComposite(dpy, ops[op[i]].op,
+					     src_color[j]->pict, 0, dst->pict,
+					     0, 0,
+					     0, 0,
+					     i, y,
+					     1, 1);
+			}
+			y++;
+		    }
+		    k++;
+		}
+	    }
+
+	    image = XGetImage(dpy, dst->d,
+			      0, 0, num_ops, y,
+			      0xffffffff, ZPixmap);
+	    copy_pict_to_win(dpy, dst, win, win_width, win_height);
+
+	    y = 0;
+	    while (k0 < k) {
+		tdst = dst_color[k0]->color;
+		color_correct(dst, &tdst);
+
+		for (j = 0; j < num_src; j++) {
+		    for (i = 0; i < num_op; i++) {
+			get_pixel_from_image(image, dst, i, y, &tested);
+
+			do_composite(ops[op[i]].op,
+				     &src_color[j]->color,
+				     NULL,
+				     &tdst,
+				     &expected,
+				     FALSE);
+			color_correct(dst, &expected);
+
+			snprintf(testname, 20, "%s blend", ops[op[i]].name);
+			if (!eval_diff(testname, &expected, &tested, 0, 0, is_verbose)) {
+			    char srcformat[20];
+
+			    describe_format(srcformat, 20, src_color[j]->format);
+			    printf("src color: %.2f %.2f %.2f %.2f (%s)\n"
+				   "dst color: %.2f %.2f %.2f %.2f\n",
+				   src_color[j]->color.r, src_color[j]->color.g,
+				   src_color[j]->color.b, src_color[j]->color.a,
+				   srcformat,
+				   dst_color[k0]->color.r, dst_color[k0]->color.g,
+				   dst_color[k0]->color.b, dst_color[k0]->color.a);
+			    printf("src: %s, dst: %s\n", src_color[j]->name, dst->name);
+			    return FALSE;
+			} else if (is_verbose) {
+			    printf("src: %s, dst: %s\n", src_color[j]->name, dst->name);
+			}
+		    }
+		    y++;
+		}
+		k0++;
+	    }
+
+	    XDestroyImage(image);
 	}
-	get_pixel(dpy, dst, 0, 0, &tested);
-	copy_pict_to_win(dpy, dst, win, TEST_WIDTH, TEST_HEIGHT);
 
-	tdst = dst_color->color;
-	color_correct(dst, &tdst);
-	do_composite(ops[op].op, &src_color->color, NULL, &tdst, &expected,
-	    FALSE);
-	color_correct(dst, &expected);
-
-	snprintf(testname, 20, "%s blend", ops[op].name);
-	if (!eval_diff(testname, &expected, &tested, 0, 0, is_verbose)) {
-		char srcformat[20];
-
-		describe_format(srcformat, 20, src_color->format);
-		printf("src color: %.2f %.2f %.2f %.2f (%s)\n"
-		    "dst color: %.2f %.2f %.2f %.2f\n",
-		    src_color->color.r, src_color->color.g,
-		    src_color->color.b, src_color->color.a,
-		    srcformat,
-		    dst_color->color.r, dst_color->color.g,
-		    dst_color->color.b, dst_color->color.a);
-		printf("src: %s, dst: %s\n", src_color->name, dst->name);
-		return FALSE;
-	} else if (is_verbose) {
-		printf("src: %s, dst: %s\n", src_color->name, dst->name);
-	}
 	return TRUE;
 }
