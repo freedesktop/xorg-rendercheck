@@ -30,7 +30,10 @@
 
 #include "rendercheck.h"
 
-/* We choose some sizes larger than win_width/height because AAs like to turn
+#define TEST_WIDTH 40
+#define TEST_HEIGHT 40
+
+/* We choose some sizes larger than width/height because AAs like to turn
  * off repeating when it's unnecessary and we want to make sure that those paths
  * are sane.
  */
@@ -72,28 +75,32 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 
 		/* Fill to the first color */
 		XRenderComposite(dpy, PictOpSrc, c1->pict, None, src.pict,
-		    0, 0, 0, 0, 0, 0, w, h);
+				 0, 0, 0, 0, 0, 0, w, h);
 		/* And set the upper-left to the second color */
 		XRenderComposite(dpy, PictOpSrc, c2->pict, None, src.pict,
-		    0, 0, 0, 0, 0, 0, c2w, c2h);
+				 0, 0, 0, 0, 0, 0, c2w, c2h);
 
 		for (i = 0; i < pixmap_move_iter; i++) {
 			/* Fill to dst_color */
-			XRenderComposite(dpy, PictOpSrc, dst_color->pict, None,
-			    dst->pict, 0, 0, 0, 0, 0, 0, win_width, win_height);
- 			/* Composite the repeat picture in. */
+			XRenderComposite(dpy, PictOpSrc,
+					 dst_color->pict, None, dst->pict,
+					 0, 0, 0, 0, 0, 0,
+					 TEST_WIDTH, TEST_HEIGHT);
+			/* Composite the repeat picture in. */
 			if (!test_mask) {
 				XRenderComposite(dpy, ops[op].op,
-				    src.pict, None, dst->pict, 0, 0, 0, 0, 0, 0,
-				    win_width, win_height);
+						 src.pict, None, dst->pict,
+						 0, 0, 0, 0, 0, 0,
+						 TEST_WIDTH, TEST_HEIGHT);
 			} else {
 				/* Using PictOpSrc, color 0 (white), and
 				 * component alpha, the mask color should be
 				 * written to the destination.
 				 */
 				XRenderComposite(dpy, ops[op].op,
-				    argb32white->pict, src.pict, dst->pict,
-				    0, 0, 0, 0, 0, 0, win_width, win_height);
+						 argb32white->pict, src.pict, dst->pict,
+						 0, 0, 0, 0, 0, 0,
+						 TEST_WIDTH, TEST_HEIGHT);
 			}
 		}
 
@@ -117,8 +124,8 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 
 		snprintf(name, 40, "%dx%d %s %s-repeat", w, h,
 		    ops[op].name, test_mask ? "mask" : "src");
-		for (x = 0; x < win_width; x++) {
-		    for (y = 0; y < win_height; y++) {
+		for (x = 0; x < TEST_WIDTH; x++) {
+		    for (y = 0; y < TEST_HEIGHT; y++) {
 			int samplex = x % w;
 			int sampley = y % h;
 			color4d *expected, tested;
