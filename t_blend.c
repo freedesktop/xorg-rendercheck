@@ -46,18 +46,18 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst,
 	k = y = 0;
 	while (k < num_dst) {
 	    XImage *image;
-	    int k0 = k;
+	    int k0 = k, k1 = k;
 	    int this_src, rem_src;
 
 	    rem_src = num_src;
 	    for (page = 0; page < num_pages; page++) {
 		    this_src = rem_src / (num_pages - page);
 		    for (iter = 0; iter < pixmap_move_iter; iter++) {
-			    k = k0;
+			    k1 = k0;
 			    y = 0;
-			    while (k < num_dst && y + this_src < win_height) {
+			    while (k1 < num_dst && y + this_src <= win_height) {
 				    XRenderComposite(dpy, PictOpSrc,
-						     dst_color[k]->pict, 0, dst->pict,
+						     dst_color[k1++]->pict, 0, dst->pict,
 						     0, 0,
 						     0, 0,
 						     0, y,
@@ -73,7 +73,6 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst,
 					    }
 					    y++;
 				    }
-				    k++;
 			    }
 		    }
 
@@ -83,14 +82,14 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst,
 		    copy_pict_to_win(dpy, dst, win, win_width, win_height);
 
 		    y = 0;
-		    while (k0 < k) {
+		    for (k = k0; k < k1; k++) {
 			    XRenderDirectFormat dst_acc;
 
 			    accuracy(&dst_acc,
 				     &dst->format->direct,
-				     &dst_color[k0]->format->direct);
+				     &dst_color[k]->format->direct);
 
-			    tdst = dst_color[k0]->color;
+			    tdst = dst_color[k]->color;
 			    color_correct(dst, &tdst);
 
 			    for (j = 0; j < this_src; j++) {
@@ -121,15 +120,16 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst,
 							   src_color[j]->color.r, src_color[j]->color.g,
 							   src_color[j]->color.b, src_color[j]->color.a,
 							   srcformat,
-							   dst_color[k0]->color.r, dst_color[k0]->color.g,
-							   dst_color[k0]->color.b, dst_color[k0]->color.a);
+							   dst_color[k]->color.r,
+							   dst_color[k]->color.g,
+							   dst_color[k]->color.b,
+							   dst_color[k]->color.a);
 						    printf("src: %s, dst: %s\n", src_color[j]->name, dst->name);
 						    return FALSE;
 					    }
 				    }
 				    y++;
 			    }
-			    k0++;
 		    }
 
 		    XDestroyImage(image);
