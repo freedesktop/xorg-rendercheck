@@ -44,6 +44,7 @@ triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	color4d tdst, tsrc;
 	int x, y;
 	Bool success = TRUE;
+	XImage *image;
 
 	triangles[0].p1.x = XDoubleToFixed(2);
 	triangles[0].p1.y = XDoubleToFixed(2);
@@ -76,6 +77,10 @@ triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	do_composite(ops[op].op, &src_color->color, NULL, &tdst, &tsrc, FALSE);
 	color_correct(dst, &tsrc);
 
+	image = XGetImage(dpy, dst->d,
+			  0, 0, 5, 5,
+			  0xffffffff, ZPixmap);
+
 	for (x = 0; x < 5; x++) {
 	    for (y = 0; y < 5; y++) {
 		color4d expected, tested;
@@ -86,7 +91,7 @@ triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 			expected = tdst;
 		}
 
-		get_pixel(dpy, dst, x, y, &tested);
+		get_pixel_from_image(image, dst, x, y, &tested);
 
 		if (eval_diff(&dst->format->direct, &expected, &tested) > 2.) {
 		    print_fail("triangles", &expected, &tested, x, y,
@@ -103,6 +108,7 @@ triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		    dst_color->color.r, dst_color->color.g,
 		    dst_color->color.b, dst_color->color.a);
 	}
+	XDestroyImage(image);
 
 	return success;
 }
@@ -115,6 +121,7 @@ trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	color4d tdst, tsrc;
 	int x, y;
 	Bool success = TRUE;
+	XImage *image;
 
 	points[0].x = XDoubleToFixed(2);
 	points[0].y = XDoubleToFixed(2);
@@ -142,6 +149,10 @@ trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	do_composite(ops[op].op, &src_color->color, NULL, &tdst, &tsrc, FALSE);
 	color_correct(dst, &tsrc);
 
+	image = XGetImage(dpy, dst->d,
+			  0, 0, 5, 5,
+			  0xffffffff, ZPixmap);
+
 	for (x = 0; x < 5; x++) {
 	    for (y = 0; y < 5; y++) {
 		color4d expected, tested;
@@ -152,7 +163,7 @@ trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 			expected = tdst;
 		}
 
-		get_pixel(dpy, dst, x, y, &tested);
+		get_pixel_from_image(image, dst, x, y, &tested);
 
 		if (eval_diff(&dst->format->direct, &expected, &tested) > 2.) {
 			print_fail("triangles", &expected, &tested, x,y,
@@ -169,6 +180,7 @@ trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		    dst_color->color.r, dst_color->color.g,
 		    dst_color->color.b, dst_color->color.a);
 	}
+	XDestroyImage(image);
 
 	return success;
 }
@@ -181,6 +193,7 @@ tristrip_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	color4d tdst, tsrc;
 	int x, y;
 	Bool success = TRUE;
+	XImage *image;
 
 	points[0].x = XDoubleToFixed(2);
 	points[0].y = XDoubleToFixed(2);
@@ -208,6 +221,10 @@ tristrip_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	do_composite(ops[op].op, &src_color->color, NULL, &tdst, &tsrc, FALSE);
 	color_correct(dst, &tsrc);
 
+	image = XGetImage(dpy, dst->d,
+			  0, 0, 5, 5,
+			  0xffffffff, ZPixmap);
+
 	for (x = 0; x < 5; x++) {
 	    for (y = 0; y < 5; y++) {
 		color4d expected, tested;
@@ -218,7 +235,7 @@ tristrip_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 			expected = tdst;
 		}
 
-		get_pixel(dpy, dst, x, y, &tested);
+		get_pixel_from_image(image, dst, x, y, &tested);
 
 		if (eval_diff(&dst->format->direct, &expected, &tested) > 2.) {
 		    print_fail("triangles", &expected, &tested, x, y,
@@ -235,6 +252,7 @@ tristrip_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		    dst_color->color.r, dst_color->color.g,
 		    dst_color->color.b, dst_color->color.a);
 	}
+	XDestroyImage(image);
 
 	return success;
 }
