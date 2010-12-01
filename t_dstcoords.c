@@ -59,9 +59,12 @@ dstcoords_test(Display *dpy, picture_info *win, int op, picture_info *dst,
 				expected = bg->color;
 
 			color_correct(dst, &expected);
-			if (!eval_diff("dst coords", &expected, &tested, x, y,
-			    is_verbose))
+			if (eval_diff(&dst->format->direct, &expected, &tested) > 2.0) {
+			    print_fail("dst coords",
+				       &expected, &tested, x, y,
+				       eval_diff(&dst->format->direct, &expected, &tested));
 				failed = TRUE;
+			}
 		}
 	}
 

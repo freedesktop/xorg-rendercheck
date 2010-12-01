@@ -35,10 +35,15 @@ fill_test(Display *dpy, picture_info *win, picture_info *src)
 	char name[20];
 
 	get_pixel(dpy, src, 0, 0, &tested);
-
 	copy_pict_to_win(dpy, src, win, win_width, win_height);
 
-	strcpy(name, "fill ");
-	describe_format(name, 20 - strlen(name), src->format);
-	return eval_diff(name, &src->color, &tested, 0, 0, is_verbose);
+	if (eval_diff(&src->format->direct, &src->color, &tested) > 2.) {
+	    strcpy(name, "fill ");
+	    describe_format(name, 20 - strlen(name), src->format);
+	    print_fail(name, &src->color, &tested, 0, 0,
+		       eval_diff(&src->format->direct, &src->color, &tested));
+	    return FALSE;
+	}
+
+	return TRUE;
 }

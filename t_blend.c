@@ -72,10 +72,20 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst,
 
 	    y = 0;
 	    while (k0 < k) {
+		XRenderDirectFormat dst_acc;
+
+		accuracy(&dst_acc,
+			 &dst->format->direct,
+			 &dst_color[k0]->format->direct);
+
 		tdst = dst_color[k0]->color;
 		color_correct(dst, &tdst);
 
 		for (j = 0; j < num_src; j++) {
+		    XRenderDirectFormat acc;
+
+		    accuracy(&acc, &src_color[j]->format->direct, &dst_acc);
+
 		    for (i = 0; i < num_op; i++) {
 			get_pixel_from_image(image, dst, i, y, &tested);
 
@@ -87,11 +97,13 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst,
 				     FALSE);
 			color_correct(dst, &expected);
 
-			snprintf(testname, 20, "%s blend", ops[op[i]].name);
-			if (!eval_diff(testname, &expected, &tested, 0, 0, is_verbose)) {
+			if (eval_diff(&acc, &expected, &tested) > 3.) {
 			    char srcformat[20];
 
+			    snprintf(testname, 20, "%s blend", ops[op[i]].name);
 			    describe_format(srcformat, 20, src_color[j]->format);
+			    print_fail(testname, &expected, &tested, 0, 0,
+				       eval_diff(&acc, &expected, &tested));
 			    printf("src color: %.2f %.2f %.2f %.2f (%s)\n"
 				   "dst color: %.2f %.2f %.2f %.2f\n",
 				   src_color[j]->color.r, src_color[j]->color.g,
@@ -101,8 +113,6 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst,
 				   dst_color[k0]->color.b, dst_color[k0]->color.a);
 			    printf("src: %s, dst: %s\n", src_color[j]->name, dst->name);
 			    return FALSE;
-			} else if (is_verbose) {
-			    printf("src: %s, dst: %s\n", src_color[j]->name, dst->name);
 			}
 		    }
 		    y++;

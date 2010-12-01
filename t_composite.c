@@ -33,7 +33,7 @@ composite_test(Display *dpy, picture_info *win, picture_info *dst,
 	       const picture_info **src_color, int num_src,
 	       const picture_info **mask_color, int num_mask,
 	       const picture_info **dst_color, int num_dst,
-	       Bool componentAlpha, Bool print_errors)
+	       Bool componentAlpha)
 {
 	color4d expected, tested, tdst, tmsk;
 	char testname[40];
@@ -44,6 +44,7 @@ composite_test(Display *dpy, picture_info *win, picture_info *dst,
 	    color_correct(dst, &tdst);
 
 	    for (m = 0; m < num_mask; m++) {
+		XRenderDirectFormat mask_acc;
 		XImage *image;
 
 		if (componentAlpha) {
@@ -100,7 +101,16 @@ composite_test(Display *dpy, picture_info *win, picture_info *dst,
 		} else
 		    tmsk = mask_color[m]->color;
 
+		accuracy(&mask_acc,
+			 &mask_color[m]->format->direct,
+			 &dst_color[d]->format->direct);
+		accuracy(&mask_acc, &mask_acc, &dst->format->direct);
+
 		for (s = 0; s < num_src; s++) {
+		    XRenderDirectFormat acc;
+
+		    accuracy(&acc, &mask_acc, &src_color[s]->format->direct);
+
 		    for (i = 0; i < num_op; i++) {
 			get_pixel_from_image(image, dst, i, s, &tested);
 
@@ -109,38 +119,33 @@ composite_test(Display *dpy, picture_info *win, picture_info *dst,
 				     &expected, componentAlpha);
 			color_correct(dst, &expected);
 
-			snprintf(testname, 40,
-				 "%s %scomposite", ops[op[i]].name,
-				 componentAlpha ? "CA " : "");
-			if (!eval_diff(testname, &expected, &tested, 0, 0,
-				       is_verbose && print_errors)) {
-			    if (print_errors)
-				printf("src color: %.2f %.2f %.2f %.2f\n"
-				       "msk color: %.2f %.2f %.2f %.2f\n"
-				       "dst color: %.2f %.2f %.2f %.2f\n",
-				       src_color[s]->color.r,
-				       src_color[s]->color.g,
-				       src_color[s]->color.b,
-				       src_color[s]->color.a,
-				       mask_color[m]->color.r,
-				       mask_color[m]->color.g,
-				       mask_color[m]->color.b,
-				       mask_color[m]->color.a,
-				       dst_color[d]->color.r,
-				       dst_color[d]->color.g,
-				       dst_color[d]->color.b,
-				       dst_color[d]->color.a);
+			if (eval_diff(&acc, &expected, &tested) > 3.) {
+			    snprintf(testname, 40,
+				     "%s %scomposite", ops[op[i]].name,
+				     componentAlpha ? "CA " : "");
+			    print_fail(testname, &expected, &tested, 0, 0,
+				       eval_diff(&acc, &expected, &tested));
+			    printf("src color: %.2f %.2f %.2f %.2f\n"
+				   "msk color: %.2f %.2f %.2f %.2f\n"
+				   "dst color: %.2f %.2f %.2f %.2f\n",
+				   src_color[s]->color.r,
+				   src_color[s]->color.g,
+				   src_color[s]->color.b,
+				   src_color[s]->color.a,
+				   mask_color[m]->color.r,
+				   mask_color[m]->color.g,
+				   mask_color[m]->color.b,
+				   mask_color[m]->color.a,
+				   dst_color[d]->color.r,
+				   dst_color[d]->color.g,
+				   dst_color[d]->color.b,
+				   dst_color[d]->color.a);
 			    printf("src: %s, mask: %s, dst: %s\n",
 				   src_color[s]->name,
 				   mask_color[m]->name,
 				   dst->name);
 			    XDestroyImage(image);
 			    return FALSE;
-			} else if (is_verbose) {
-			    printf("src: %s, mask: %s, dst: %s\n",
-				   src_color[s]->name,
-				   mask_color[m]->name,
-				   dst->name);
 			}
 		    }
 		}

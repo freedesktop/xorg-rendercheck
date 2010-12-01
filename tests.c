@@ -156,43 +156,63 @@ get_pixel(Display *dpy,
 	XDestroyImage(image);
 }
 
-int
-eval_diff(char *name, color4d *expected, color4d *test, int x, int y,
-    Bool verbose)
+void
+accuracy(XRenderDirectFormat *result,
+	 const XRenderDirectFormat *a,
+	 const XRenderDirectFormat *b)
 {
-	double rscale, gscale, bscale, ascale;
-	double rdiff, gdiff, bdiff, adiff, diff;
+    result->redMask = min(a->redMask, b->redMask);
+    result->greenMask = min(a->greenMask, b->greenMask);
+    result->blueMask = min(a->blueMask, b->blueMask);
+    result->alphaMask = min(a->alphaMask, b->alphaMask);
+}
 
-	/* XXX: Need to be provided mask shifts so we can produce useful error
-	 * values.
-	 */
-	rscale = 1.0 * (1 << 5);
-	gscale = 1.0 * (1 << 6);
-	bscale = 1.0 * (1 << 5);
-	ascale = 1.0 * 32;
-	rdiff = fabs(test->r - expected->r) * rscale;
-	bdiff = fabs(test->g - expected->g) * gscale;
-	gdiff = fabs(test->b - expected->b) * bscale;
-	adiff = fabs(test->a - expected->a) * ascale;
-	/*rdiff = log2(1.0 + rdiff);
+double
+eval_diff(const XRenderDirectFormat *format,
+	  const color4d *expected,
+	  const color4d *test)
+{
+	double rdiff, gdiff, bdiff, adiff;
+
+	rdiff = fabs(test->r - expected->r) * format->redMask;
+	bdiff = fabs(test->g - expected->g) * format->greenMask;
+	gdiff = fabs(test->b - expected->b) * format->blueMask;
+	adiff = fabs(test->a - expected->a) * format->alphaMask;
+
+#if 0
+	rdiff = log2(1.0 + rdiff);
 	gdiff = log2(1.0 + gdiff);
 	bdiff = log2(1.0 + bdiff);
-	adiff = log2(1.0 + adiff);*/
-	diff = max(max(max(rdiff, gdiff), bdiff), adiff);
-	if (diff > 3.0) {
-		printf("%s test error of %.4f at (%d, %d) --\n"
-		    "           R    G    B    A\n"
-		    "got:       %.2f %.2f %.2f %.2f\n"
-		    "expected:  %.2f %.2f %.2f %.2f\n", name, diff, x, y,
-		    test->r, test->g, test->b, test->a,
-		    expected->r, expected->g, expected->b, expected->a);
-		return FALSE;
-	} else if (verbose) {
-		printf("%s test succeeded at (%d, %d) with %.4f: "
-		    "%.2f %.2f %.2f %.2f\n", name, x, y, diff,
-		    expected->r, expected->g, expected->b, expected->a);
-	}
-	return TRUE;
+	adiff = log2(1.0 + adiff);
+#endif
+
+	return max(max(max(rdiff, gdiff), bdiff), adiff);
+}
+
+void print_fail(const char *name,
+		const color4d *expected,
+		const color4d *test,
+		int x, int y,
+		double d)
+{
+    printf("%s test error of %.4f at (%d, %d) --\n"
+	   "           R     G     B     A\n"
+	   "got:       %.3f %.3f %.3f %.3f\n"
+	   "expected:  %.3f %.3f %.3f %.3f\n",
+	   name, d, x, y,
+	   test->r, test->g, test->b, test->a,
+	   expected->r, expected->g, expected->b, expected->a);
+}
+
+void print_pass(const char *name,
+		const color4d *expected,
+		int x, int y,
+		double d)
+{
+    printf("%s test succeeded at (%d, %d) with %.4f: "
+	   "%.2f %.2f %.2f %.2f\n",
+	   name, x, y, d,
+	   expected->r, expected->g, expected->b, expected->a);
 }
 
 void
@@ -578,7 +598,7 @@ do {								\
 					test_src, num_test_src,
 					test_mask, num_test_mask,
 					test_dst, num_test_dst,
-					FALSE, TRUE);
+					FALSE);
 		    RECORD_RESULTS();
 		}
 		if (group_ok)
@@ -603,7 +623,7 @@ do {								\
 					test_src, num_test_src,
 					test_mask, num_test_mask,
 					test_dst, num_test_dst,
-					TRUE, TRUE);
+					TRUE);
 		    RECORD_RESULTS();
 		}
 		if (group_ok)

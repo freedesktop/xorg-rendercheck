@@ -88,10 +88,10 @@ triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 
 		get_pixel(dpy, dst, x, y, &tested);
 
-		if (!eval_diff("triangles", &expected, &tested, x, y,
-		    is_verbose))
-		{
-			success = FALSE;
+		if (eval_diff(&dst->format->direct, &expected, &tested) > 2.) {
+		    print_fail("triangles", &expected, &tested, x, y,
+			       eval_diff(&dst->format->direct, &expected, &tested));
+		    success = FALSE;
 		}
 	    }
 	}
@@ -154,9 +154,9 @@ trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 
 		get_pixel(dpy, dst, x, y, &tested);
 
-		if (!eval_diff("triangles", &expected, &tested, x, y,
-		    is_verbose))
-		{
+		if (eval_diff(&dst->format->direct, &expected, &tested) > 2.) {
+			print_fail("triangles", &expected, &tested, x,y,
+				   eval_diff(&dst->format->direct, &expected, &tested));
 			success = FALSE;
 		}
 	    }
@@ -220,10 +220,10 @@ tristrip_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 
 		get_pixel(dpy, dst, x, y, &tested);
 
-		if (!eval_diff("triangles", &expected, &tested, x, y,
-		    is_verbose))
-		{
-			success = FALSE;
+		if (eval_diff(&dst->format->direct, &expected, &tested) > 2.) {
+		    print_fail("triangles", &expected, &tested, x, y,
+			       eval_diff(&dst->format->direct, &expected, &tested));
+		    success = FALSE;
 		}
 	    }
 	}

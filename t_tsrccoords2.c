@@ -121,7 +121,6 @@ trans_srccoords_test_2(Display *dpy, picture_info *win, picture_info *white,
 	}
 
 	for (i = 0; i < 25; i++) {
-		char name[20];
 		int x = i % 5, y = i / 5, srcx, srcy;
 
 		get_pixel(dpy, win, x, y, &tested);
@@ -142,12 +141,12 @@ trans_srccoords_test_2(Display *dpy, picture_info *win, picture_info *white,
 		} else
 			tested_colors[y][x] = 9;
 
-		if (test_mask)
-			snprintf(name, 20, "mask coords");
-		else
-			snprintf(name, 20, "src coords");
-		if (!eval_diff(name, &expected, &tested, x, y, is_verbose))
+		if (eval_diff(&win->format->direct, &expected, &tested) > 2.) {
+		    print_fail(test_mask ? "mask coords" : "src coords",
+			       &expected, &tested, x, y,
+			       eval_diff(&win->format->direct, &expected, &tested));
 			failed = TRUE;
+		}
 	}
 	if (failed) {
 		int x, y;

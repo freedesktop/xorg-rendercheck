@@ -305,8 +305,11 @@ Bool linear_gradient_test(Display *dpy, picture_info *win,
                                  &expected, False);
                     color_correct(dst, &expected);
 
-                    snprintf(testname, 40, "%s linear gradient", ops[op].name);
-                    if (!eval_diff(testname, &expected, &tested, 0, 0, is_verbose)) {
+                    if (eval_diff(&dst->format->direct, &expected, &tested) > 3.) {
+			snprintf(testname, 40,
+				 "%s linear gradient", ops[op].name);
+			print_fail(testname, &expected, &tested, 0, 0,
+				   eval_diff(&dst->format->direct, &expected, &tested));
                         printf("gradient: %d stops: %d repeat: %d pos: %d/%d\n"
                                "src color: %.2f %.2f %.2f %.2f\n"
                                "dst color: %.2f %.2f %.2f %.2f\n",

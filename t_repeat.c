@@ -63,6 +63,7 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		char name[40];
 		color4d tdst, c1expected, c2expected;
 		XRenderPictureAttributes pa;
+		XRenderDirectFormat acc;
 
 		pa.component_alpha = test_mask;
 		pa.repeat = TRUE;
@@ -108,6 +109,12 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		tdst = dst_color->color;
 		color_correct(dst, &tdst);
 
+		accuracy(&acc,
+			 &dst->format->direct,
+			 &dst_color->format->direct);
+		accuracy(&acc, &acc, &c1->format->direct);
+		accuracy(&acc, &acc, &c2->format->direct);
+
 		if (!test_mask) {
 			do_composite(ops[op].op, &c1->color, NULL, &tdst,
 			    &c1expected, FALSE);
@@ -122,8 +129,6 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		color_correct(dst, &c1expected);
 		color_correct(dst, &c2expected);
 
-		snprintf(name, 40, "%dx%d %s %s-repeat", w, h,
-		    ops[op].name, test_mask ? "mask" : "src");
 		for (x = 0; x < TEST_WIDTH; x++) {
 		    for (y = 0; y < TEST_HEIGHT; y++) {
 			int samplex = x % w;
@@ -137,9 +142,14 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 			}
 			get_pixel(dpy, dst, x, y, &tested);
 
-			if (!eval_diff(name, expected, &tested, x, y,
-			    is_verbose))
+			if (eval_diff(&acc, expected, &tested) > 3.) {
+			    snprintf(name, 40, "%dx%d %s %s-repeat", w, h,
+				     ops[op].name, test_mask ? "mask" : "src");
+
+			    print_fail(name, expected, &tested, x, y,
+				       eval_diff(&acc, expected, &tested));
 				failed = TRUE;
+			}
 		    }
 		}
 		XRenderFreePicture(dpy, src.pict);

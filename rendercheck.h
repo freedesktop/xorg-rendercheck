@@ -117,9 +117,26 @@ get_pixel_from_image(XImage *image,
 		     int x, int y,
 		     color4d *color);
 
-int
-eval_diff(char *name, color4d *expected, color4d *test, int x, int y,
-    Bool verbose);
+void
+accuracy(XRenderDirectFormat *result,
+	 const XRenderDirectFormat *a,
+	 const XRenderDirectFormat *b);
+
+double
+eval_diff(const XRenderDirectFormat *accuracy,
+	  const color4d *expected,
+	  const color4d *test);
+
+void print_fail(const char *name,
+		const color4d *expected,
+		const color4d *test,
+		int x, int y,
+		double d);
+
+void print_pass(const char *name,
+		const color4d *expected,
+		int x, int y,
+		double d);
 
 void
 argb_fill(Display *dpy, picture_info *p, int x, int y, int w, int h, float a,
@@ -154,7 +171,7 @@ composite_test(Display *dpy, picture_info *win, picture_info *dst,
 	       const picture_info **src_color, int num_src,
 	       const picture_info **mask_color, int num_mask,
 	       const picture_info **dst_color, int num_dst,
-	       Bool componentAlpha, Bool print_errors);
+	       Bool componentAlpha);
 
 Bool
 dstcoords_test(Display *dpy, picture_info *win, int op, picture_info *dst,
