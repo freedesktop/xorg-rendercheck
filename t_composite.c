@@ -24,81 +24,129 @@
 
 #include "rendercheck.h"
 
-#define TEST_WIDTH	10
-#define TEST_HEIGHT	10
-
 /* Test a composite of a given operation, source, mask, and destination picture.
  * Fills the window, and samples from the 0,0 pixel corner.
  */
 Bool
-composite_test(Display *dpy, picture_info *win, picture_info *dst, int op,
-    picture_info *src_color, picture_info *mask_color, picture_info *dst_color,
-    Bool componentAlpha, Bool print_errors)
+composite_test(Display *dpy, picture_info *win, picture_info *dst,
+	       const int *op, int num_op,
+	       const picture_info **src_color, int num_src,
+	       const picture_info **mask_color, int num_mask,
+	       const picture_info **dst_color, int num_dst,
+	       Bool componentAlpha, Bool print_errors)
 {
 	color4d expected, tested, tdst, tmsk;
 	char testname[40];
-	XRenderPictureAttributes pa;
-	Bool success = TRUE;
-	int i;
+	int i, s, m, d, iter;
 
-	if (componentAlpha) {
-		pa.component_alpha = TRUE;
-		XRenderChangePicture(dpy, mask_color->pict, CPComponentAlpha,
-		    &pa);
+	for (d = 0; d < num_dst; d++) {
+	    tdst = dst_color[d]->color;
+	    color_correct(dst, &tdst);
+
+	    for (m = 0; m < num_mask; m++) {
+		XImage *image;
+
+		if (componentAlpha) {
+		    XRenderPictureAttributes pa;
+
+		    pa.component_alpha = TRUE;
+		    XRenderChangePicture(dpy, mask_color[m]->pict,
+					 CPComponentAlpha, &pa);
+		}
+
+		for (iter = 0; iter < pixmap_move_iter; iter++) {
+		    XRenderComposite(dpy, PictOpSrc,
+				     dst_color[d]->pict, 0, dst->pict,
+				     0, 0,
+				     0, 0,
+				     0, 0,
+				     num_op, num_src);
+		    for (s = 0; s < num_src; s++) {
+			for (i = 0; i < num_op; i++)
+			    XRenderComposite(dpy, ops[op[i]].op,
+					     src_color[s]->pict,
+					     mask_color[m]->pict,
+					     dst->pict,
+					     0, 0,
+					     0, 0,
+					     i, s,
+					     1, 1);
+		    }
+		}
+
+		if (componentAlpha) {
+		    XRenderPictureAttributes pa;
+
+		    pa.component_alpha = FALSE;
+		    XRenderChangePicture(dpy, mask_color[m]->pict,
+					 CPComponentAlpha, &pa);
+		}
+
+		image = XGetImage(dpy, dst->d,
+				  0, 0, num_op, num_src,
+				  0xffffffff, ZPixmap);
+		copy_pict_to_win(dpy, dst, win, win_width, win_height);
+
+		if (componentAlpha &&
+		    mask_color[m]->format->direct.redMask == 0) {
+		    /* Ax component-alpha masks expand alpha into
+		     * all color channels.
+		     * XXX: This should be located somewhere generic.
+		     */
+		    tmsk.a = mask_color[m]->color.a;
+		    tmsk.r = mask_color[m]->color.a;
+		    tmsk.g = mask_color[m]->color.a;
+		    tmsk.b = mask_color[m]->color.a;
+		} else
+		    tmsk = mask_color[m]->color;
+
+		for (s = 0; s < num_src; s++) {
+		    for (i = 0; i < num_op; i++) {
+			get_pixel_from_image(image, dst, i, s, &tested);
+
+			do_composite(ops[op[i]].op,
+				     &src_color[s]->color, &tmsk, &tdst,
+				     &expected, componentAlpha);
+			color_correct(dst, &expected);
+
+			snprintf(testname, 40,
+				 "%s %scomposite", ops[op[i]].name,
+				 componentAlpha ? "CA " : "");
+			if (!eval_diff(testname, &expected, &tested, 0, 0,
+				       is_verbose && print_errors)) {
+			    if (print_errors)
+				printf("src color: %.2f %.2f %.2f %.2f\n"
+				       "msk color: %.2f %.2f %.2f %.2f\n"
+				       "dst color: %.2f %.2f %.2f %.2f\n",
+				       src_color[s]->color.r,
+				       src_color[s]->color.g,
+				       src_color[s]->color.b,
+				       src_color[s]->color.a,
+				       mask_color[m]->color.r,
+				       mask_color[m]->color.g,
+				       mask_color[m]->color.b,
+				       mask_color[m]->color.a,
+				       dst_color[d]->color.r,
+				       dst_color[d]->color.g,
+				       dst_color[d]->color.b,
+				       dst_color[d]->color.a);
+			    printf("src: %s, mask: %s, dst: %s\n",
+				   src_color[s]->name,
+				   mask_color[m]->name,
+				   dst->name);
+			    XDestroyImage(image);
+			    return FALSE;
+			} else if (is_verbose) {
+			    printf("src: %s, mask: %s, dst: %s\n",
+				   src_color[s]->name,
+				   mask_color[m]->name,
+				   dst->name);
+			}
+		    }
+		}
+		XDestroyImage(image);
+	    }
 	}
-	for (i = 0; i < pixmap_move_iter; i++) {
-		XRenderComposite(dpy, PictOpSrc, dst_color->pict, 0, dst->pict,
-		    0, 0, 0, 0, 0, 0, TEST_WIDTH, TEST_HEIGHT);
-		XRenderComposite(dpy, ops[op].op, src_color->pict,
-		    mask_color->pict, dst->pict, 0, 0, 0, 0, 0, 0,
-		    TEST_WIDTH, TEST_HEIGHT);
-	}
-	get_pixel(dpy, dst, 0, 0, &tested);
-	copy_pict_to_win(dpy, dst, win, TEST_WIDTH, TEST_HEIGHT);
 
-	if (componentAlpha) {
-		pa.component_alpha = FALSE;
-		XRenderChangePicture(dpy, mask_color->pict, CPComponentAlpha,
-		    &pa);
-	}
-
-	if (componentAlpha && mask_color->format->direct.redMask == 0) {
-		/* Ax component-alpha masks expand alpha into all color
-		 * channels.  XXX: This should be located somewhere generic.
-		 */
-		tmsk.a = mask_color->color.a;
-		tmsk.r = mask_color->color.a;
-		tmsk.g = mask_color->color.a;
-		tmsk.b = mask_color->color.a;
-	} else
-		tmsk = mask_color->color;
-
-	tdst = dst_color->color;
-	color_correct(dst, &tdst);
-	do_composite(ops[op].op, &src_color->color, &tmsk, &tdst,
-	    &expected, componentAlpha);
-	color_correct(dst, &expected);
-
-	snprintf(testname, 40, "%s %scomposite", ops[op].name,
-	    componentAlpha ? "CA " : "");
-	if (!eval_diff(testname, &expected, &tested, 0, 0, is_verbose &&
-	    print_errors)) {
-		if (print_errors)
-			printf("src color: %.2f %.2f %.2f %.2f\n"
-			    "msk color: %.2f %.2f %.2f %.2f\n"
-			    "dst color: %.2f %.2f %.2f %.2f\n",
-			    src_color->color.r, src_color->color.g,
-			    src_color->color.b, src_color->color.a,
-			    mask_color->color.r, mask_color->color.g,
-			    mask_color->color.b, mask_color->color.a,
-			    dst_color->color.r, dst_color->color.g,
-			    dst_color->color.b, dst_color->color.a);
-		printf("src: %s, mask: %s, dst: %s\n", src_color->name,
-		    mask_color->name, dst->name);
-		success = FALSE;
-	} else if (is_verbose) {
-		printf("src: %s, mask: %s, dst: %s\n", src_color->name,
-		    mask_color->name, dst->name);
-	}
-	return success;
+	return TRUE;
 }

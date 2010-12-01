@@ -296,11 +296,17 @@ create_formats_list(Display *dpy)
 Bool
 do_tests(Display *dpy, picture_info *win)
 {
-	int i, j, src, dst = 0, mask;
+	int i, j, src;
 	int num_dests;
 	picture_info *dests, *pictures_1x1, *pictures_10x10, picture_3x3, *pictures_solid;
 	int success_mask = 0, tests_passed = 0, tests_total = 0;
 	int num_tests;
+	int *test_ops;
+	const picture_info **test_src, **test_mask, **test_dst;
+	int num_test_ops = 0;
+	int num_test_src = 0;
+	int num_test_mask = 0;
+	int num_test_dst = 0;
 
 	create_formats_list(dpy);
 
@@ -426,6 +432,30 @@ do {								\
 
 	num_tests = num_colors * nformats;
 
+	test_ops = malloc(sizeof(int)*num_ops);
+	test_src = malloc(sizeof(picture_info*)*(2*num_tests+num_colors));
+	test_mask = malloc(sizeof(picture_info*)*2*num_tests);
+	test_dst = malloc(sizeof(picture_info*)*(num_tests+num_colors));
+
+	for (i = 0; i < num_ops; i++) {
+	    if (ops[i].disabled)
+		continue;
+
+	    test_ops[num_test_ops++] = i;
+	}
+
+	for (i = 0; i < num_tests; i++) {
+	    test_src[num_test_src++] = &pictures_1x1[i];
+	    test_src[num_test_src++] = &pictures_10x10[i];
+	    test_mask[num_test_mask++] = &pictures_1x1[i];
+	    test_mask[num_test_mask++] = &pictures_10x10[i];
+	    test_dst[num_test_dst++] = &pictures_1x1[i];
+	}
+	for (i = 0; i < num_colors; i++) {
+	    test_src[num_test_src++] = &pictures_solid[i];
+	    test_dst[num_test_dst++] = &pictures_solid[i];
+	}
+
 	if (enabled_tests & TEST_FILL) {
 		Bool ok, group_ok = TRUE;
 
@@ -509,29 +539,6 @@ do {								\
 
 	if (enabled_tests & TEST_BLEND) {
 		Bool ok, group_ok = TRUE;
-		int *blend_ops = malloc(sizeof(int)*num_ops);
-		const picture_info **blend_src = malloc(sizeof(picture_info*)*(2*num_tests+num_colors));
-		const picture_info **blend_dst = malloc(sizeof(picture_info*)*(num_tests+num_colors));
-		int num_blend_ops = 0;
-		int num_blend_src = 0;
-		int num_blend_dst = 0;
-
-		for (i = 0; i < num_ops; i++) {
-		    if (ops[i].disabled)
-			continue;
-
-		    blend_ops[num_blend_ops++] = i;
-		}
-
-		for (i = 0; i < num_tests; i++) {
-		    blend_src[num_blend_src++] = &pictures_1x1[i];
-		    blend_src[num_blend_src++] = &pictures_10x10[i];
-		    blend_dst[num_blend_dst++] = &pictures_1x1[i];
-		}
-		for (i = 0; i < num_colors; i++) {
-		    blend_src[num_blend_src++] = &pictures_solid[i];
-		    blend_dst[num_blend_dst++] = &pictures_solid[i];
-		}
 
 		for (j = 0; j <= num_dests; j++) {
 		    picture_info *pi;
@@ -544,63 +551,35 @@ do {								\
 		    printf("Beginning blend test on %s\n", pi->name);
 
 		    ok = blend_test(dpy, win, pi,
-				    blend_ops, num_blend_ops,
-				    blend_src, num_blend_src,
-				    blend_dst, num_blend_dst);
+				    test_ops, num_test_ops,
+				    test_src, num_test_src,
+				    test_dst, num_test_dst);
 		    RECORD_RESULTS();
 		}
 		if (group_ok)
 			success_mask |= TEST_BLEND;
-
-		free(blend_ops);
-		free(blend_src);
-		free(blend_dst);
 	}
 
 	if (enabled_tests & TEST_COMPOSITE) {
 		Bool ok, group_ok = TRUE;
 
-		for (i = 0; i < num_ops; i++) {
-		    if (ops[i].disabled)
-			continue;
+		for (j = 0; j <= num_dests; j++) {
+		    picture_info *pi;
 
-		    for (j = 0; j <= num_dests; j++) {
-			picture_info *pi;
+		    if (j != num_dests)
+			pi = &dests[j];
+		    else
+			pi = win;
 
-			if (j != num_dests)
-				pi = &dests[j];
-			else
-				pi = win;
-			printf("Beginning %s composite mask test on %s\n",
-			    ops[i].name, pi->name);
+		    printf("Beginning composite mask test on %s\n", pi->name);
 
-			for (src = 0; src < num_tests; src++) {
-			    for (mask = 0; mask < num_tests; mask++) {
-				for (dst = 0; dst < num_tests; dst++) {
-					ok = composite_test(dpy, win, pi, i,
-					    &pictures_10x10[src],
-					    &pictures_10x10[mask],
-					    &pictures_1x1[dst], FALSE, TRUE);
-					RECORD_RESULTS();
-					ok = composite_test(dpy, win, pi, i,
-					    &pictures_1x1[src],
-					    &pictures_10x10[mask],
-					    &pictures_1x1[dst], FALSE, TRUE);
-					RECORD_RESULTS();
-					ok = composite_test(dpy, win, pi, i,
-					    &pictures_10x10[src],
-					    &pictures_1x1[mask],
-					    &pictures_1x1[dst], FALSE, TRUE);
-					RECORD_RESULTS();
-					ok = composite_test(dpy, win, pi, i,
-					    &pictures_1x1[src],
-					    &pictures_1x1[mask],
-					    &pictures_1x1[dst], FALSE, TRUE);
-					RECORD_RESULTS();
-				}
-			    }
-			}
-		    }
+		    ok = composite_test(dpy, win, pi,
+					test_ops, num_test_ops,
+					test_src, num_test_src,
+					test_mask, num_test_mask,
+					test_dst, num_test_dst,
+					FALSE, TRUE);
+		    RECORD_RESULTS();
 		}
 		if (group_ok)
 			success_mask |= TEST_COMPOSITE;
@@ -609,47 +588,23 @@ do {								\
 	if (enabled_tests & TEST_CACOMPOSITE) {
 		Bool ok, group_ok = TRUE;
 
-		for (i = 0; i < num_ops; i++) {
-		    if (ops[i].disabled)
-			continue;
+		for (j = 0; j <= num_dests; j++) {
+		    picture_info *pi;
 
-		    for (j = 0; j <= num_dests; j++) {
-			picture_info *pi;
+		    if (j != num_dests)
+			pi = &dests[j];
+		    else
+			pi = win;
 
-			if (j != num_dests)
-				pi = &dests[j];
-			else
-				pi = win;
-			printf("Beginning %s composite CA mask test on %s\n",
-			    ops[i].name, pi->name);
+		    printf("Beginning composite CA mask test on %s\n", pi->name);
 
-			for (src = 0; src < num_tests; src++) {
-			    for (mask = 0; mask < num_tests; mask++) {
-				for (dst = 0; dst < num_tests; dst++) {
-					ok = composite_test(dpy, win, pi, i,
-					    &pictures_10x10[src],
-					    &pictures_10x10[mask],
-					    &pictures_1x1[dst], TRUE, TRUE);
-					RECORD_RESULTS();
-					ok = composite_test(dpy, win, pi, i,
-					    &pictures_1x1[src],
-					    &pictures_10x10[mask],
-					    &pictures_1x1[dst], TRUE, TRUE);
-					RECORD_RESULTS();
-					ok = composite_test(dpy, win, pi, i,
-					    &pictures_10x10[src],
-					    &pictures_1x1[mask],
-					    &pictures_1x1[dst], TRUE, TRUE);
-					RECORD_RESULTS();
-					ok = composite_test(dpy, win, pi, i,
-					    &pictures_1x1[src],
-					    &pictures_1x1[mask],
-					    &pictures_1x1[dst], TRUE, TRUE);
-					RECORD_RESULTS();
-				}
-			    }
-			}
-		    }
+		    ok = composite_test(dpy, win, pi,
+					test_ops, num_test_ops,
+					test_src, num_test_src,
+					test_mask, num_test_mask,
+					test_dst, num_test_dst,
+					TRUE, TRUE);
+		    RECORD_RESULTS();
 		}
 		if (group_ok)
 			success_mask |= TEST_CACOMPOSITE;
@@ -771,6 +726,11 @@ do {								\
 	    if (group_ok)
 		success_mask |= TEST_BUG7366;
 	}
+
+	free(test_ops);
+	free(test_src);
+	free(test_mask);
+	free(test_dst);
 
 	printf("%d tests passed of %d total\n", tests_passed, tests_total);
 

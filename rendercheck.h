@@ -149,9 +149,12 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst,
 	   const picture_info **dst_color, int num_dst);
 
 Bool
-composite_test(Display *dpy, picture_info *win, picture_info *dst, int op,
-    picture_info *src_color, picture_info *mask_color, picture_info *dst_color,
-    Bool componentAlpha, Bool print_errors);
+composite_test(Display *dpy, picture_info *win, picture_info *dst,
+	       const int *op, int num_op,
+	       const picture_info **src_color, int num_src,
+	       const picture_info **mask_color, int num_mask,
+	       const picture_info **dst_color, int num_dst,
+	       Bool componentAlpha, Bool print_errors);
 
 Bool
 dstcoords_test(Display *dpy, picture_info *win, int op, picture_info *dst,
