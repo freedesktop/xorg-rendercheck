@@ -38,6 +38,7 @@ dstcoords_test(Display *dpy, picture_info *win, int op, picture_info *dst,
     picture_info *bg, picture_info *fg)
 {
 	color4d expected, tested;
+	XImage *image;
 	int x, y, i;
 	Bool failed = FALSE;
 
@@ -50,9 +51,13 @@ dstcoords_test(Display *dpy, picture_info *win, int op, picture_info *dst,
 
 	copy_pict_to_win(dpy, dst, win, TEST_WIDTH, TEST_HEIGHT);
 
+	image = XGetImage(dpy, dst->d,
+			  0, 0, 5, 5,
+			  ~0U, ZPixmap);
+
 	for (x = 0; x < 5; x++) {
 		for (y = 0; y < 5; y++) {
-			get_pixel(dpy, dst, x, y, &tested);
+			get_pixel_from_image(image, dst, x, y, &tested);
 			if ((x >= 1 && x <= 3) && (y >= 1 && y <= 3))
 				expected = fg->color;
 			else
@@ -67,6 +72,8 @@ dstcoords_test(Display *dpy, picture_info *win, int op, picture_info *dst,
 			}
 		}
 	}
+
+	XDestroyImage(image);
 
 	return !failed;
 }
