@@ -19,7 +19,6 @@ XORG_MACROS_VERSION(1.8)
 XORG_DEFAULT_OPTIONS
 
 # Checks for header files.
-AC_HEADER_STDC
 AC_CHECK_HEADERS([err.h])
 
 # Checks for pkg-config packages
