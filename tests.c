@@ -753,6 +753,8 @@ do {								\
 	free(test_dst);
 
 	printf("%d tests passed of %d total\n", tests_passed, tests_total);
+	printf("Successful Groups:\n");
+	print_tests(stdout, success_mask);
 
 	return tests_passed == tests_total;
 }

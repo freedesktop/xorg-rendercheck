@@ -103,16 +103,55 @@ describe_format(char *desc, int len, XRenderPictFormat *format)
 	}
 }
 
+struct {
+    int flag;
+    const char *name;
+} available_tests[] = {
+    {TEST_FILL, "fill"},
+    {TEST_DSTCOORDS, "dcoords"},
+    {TEST_SRCCOORDS, "scoords"},
+    {TEST_MASKCOORDS, "mcoords"},
+    {TEST_TSRCCOORDS, "tscoords"},
+    {TEST_TMASKCOORDS, "tmcoords"},
+    {TEST_BLEND, "blend"},
+    {TEST_COMPOSITE, "composite"},
+    {TEST_CACOMPOSITE, "cacomposite"},
+    {TEST_GRADIENTS, "gradients"},
+    {TEST_REPEAT, "repeat"},
+    {TEST_TRIANGLES, "triangles"},
+    {TEST_BUG7366, "bug7366"},
+    {0, NULL}
+};
+
+void print_tests(FILE *file, int tests) {
+    int i, j;
+    
+    for (i=0, j=0; available_tests[i].name; i++) {
+        if (!(available_tests[i].flag & tests))
+            continue;
+        if (j % 5 == 0) {
+            if(j != 0)
+                putc('\n', stderr);
+            putc('\t', stderr);
+        } else {
+            fprintf(stderr, ", ");
+        }
+        fprintf(stderr, "%s", available_tests[i].name);
+        j++;
+    }
+    if (j)
+        fprintf(file, "\n");
+}
+
+_X_NORETURN
 static void
 usage (char *program)
 {
     fprintf(stderr, "usage: %s [-d|--display display] [-v|--verbose]\n"
 	"\t[-t test1,test2,...] [-o op1,op2,...] [-f format1,format2,...]\n"
 	"\t[--sync] [--minimalrendering] [--version]\n"
-            "\tAvailable tests: fill,dcoords,scoords,mcoords,tscoords,\n"
-            "\t\ttmcoords,blend,composite,cacomposite,gradients,repeat,triangles,\n"
-            "\t\tbug7366\n",
-	program);
+	"Available tests:\n", program);
+    print_tests(stderr, ~0);
     exit(1);
 }
 
@@ -197,35 +236,15 @@ int main(int argc, char **argv)
 			enabled_tests = 0;
 
 			while ((test = strsep(&nextname, ",")) != NULL) {
-				if (strcmp(test, "fill") == 0) {
-					enabled_tests |= TEST_FILL;
-				} else if (strcmp(test, "dcoords") == 0) {
-					enabled_tests |= TEST_DSTCOORDS;
-				} else if (strcmp(test, "scoords") == 0) {
-					enabled_tests |= TEST_SRCCOORDS;
-				} else if (strcmp(test, "mcoords") == 0) {
-					enabled_tests |= TEST_MASKCOORDS;
-				} else if (strcmp(test, "tscoords") == 0) {
-					enabled_tests |= TEST_TSRCCOORDS;
-				} else if (strcmp(test, "tmcoords") == 0) {
-					enabled_tests |= TEST_TMASKCOORDS;
-				} else if (strcmp(test, "blend") == 0) {
-					enabled_tests |= TEST_BLEND;
-				} else if (strcmp(test, "composite") == 0) {
-					enabled_tests |= TEST_COMPOSITE;
-				} else if (strcmp(test, "cacomposite") == 0) {
-					enabled_tests |= TEST_CACOMPOSITE;
-				} else if (strcmp(test, "gradients") == 0) {
-					enabled_tests |= TEST_GRADIENTS;
-				} else if (strcmp(test, "repeat") == 0) {
-					enabled_tests |= TEST_REPEAT;
-				} else if (strcmp(test, "triangles") == 0) {
-					enabled_tests |= TEST_TRIANGLES;
-				} else if (strcmp(test, "bug7366") == 0) {
-					enabled_tests |= TEST_BUG7366;
-				} else {
-					usage(argv[0]);
+				int i;
+				for(i=0; available_tests[i].name; i++) {
+					if(strcmp(test, available_tests[i].name) == 0) {
+						enabled_tests |= available_tests[i].flag;
+						break;
+					}
 				}
+				if(available_tests[i].name == NULL)
+					usage(argv[0]);
 			}
 
 			break;

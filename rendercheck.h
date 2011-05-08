@@ -22,12 +22,12 @@
 
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrender.h>
+#include <stdio.h>
 
 #if HAVE_ERR_H
 # include <err.h>
 #else
 # include <stdarg.h>
-# include <stdio.h>
 # include <stdlib.h>
 static inline void errx(int eval, const char *fmt, ...) {
     va_list args;
@@ -100,6 +100,9 @@ describe_format(char *desc, int len, XRenderPictFormat *format);
 
 int
 bit_count(int i);
+
+void
+print_tests(FILE *file, int tests);
 
 /* tests.c */
 void
