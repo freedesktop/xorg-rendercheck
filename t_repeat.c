@@ -69,7 +69,7 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		pa.component_alpha = test_mask;
 		pa.repeat = TRUE;
 
-		src.d = XCreatePixmap(dpy, RootWindow(dpy, 0), w, h, 32);
+		src.d = XCreatePixmap(dpy, DefaultRootWindow(dpy), w, h, 32);
 		src.format = XRenderFindStandardFormat(dpy, PictStandardARGB32);
 		src.pict = XRenderCreatePicture(dpy, src.d, src.format,
 		    CPComponentAlpha | CPRepeat, &pa);

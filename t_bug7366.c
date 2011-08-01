@@ -69,7 +69,7 @@ bug7366_test_set_alpha_map(Display *dpy)
     memset(&color, 0, sizeof(color));
     source_pict = XRenderCreateSolidFill(dpy, &color);
 
-    pixmap = XCreatePixmap(dpy, RootWindow(dpy, 0), 1, 1, 32);
+    pixmap = XCreatePixmap(dpy, DefaultRootWindow(dpy), 1, 1, 32);
     pict = XRenderCreatePicture(dpy, pixmap,
         XRenderFindStandardFormat(dpy, PictStandardARGB32), 0, NULL);
 

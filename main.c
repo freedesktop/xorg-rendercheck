@@ -289,8 +289,8 @@ int main(int argc, char **argv)
 		num_ops = PictOpSaturate;
 	}
 
-	window.d = XCreateSimpleWindow(dpy, RootWindow(dpy, 0), 0, 0, win_width,
-	    win_height, 0, 0, WhitePixel(dpy, 0));
+	window.d = XCreateSimpleWindow(dpy, DefaultRootWindow(dpy), 0, 0,
+	    win_width, win_height, 0, 0, WhitePixel(dpy, 0));
 
 	as.override_redirect = True;
 	XChangeWindowAttributes(dpy, window.d, CWOverrideRedirect, &as);

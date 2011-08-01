@@ -43,7 +43,7 @@ static picture_info *create_target_picture(Display *dpy)
 
 	p = malloc(sizeof(picture_info));
 
-	p->d = XCreatePixmap(dpy, RootWindow(dpy, 0), 5, 5, 32);
+	p->d = XCreatePixmap(dpy, DefaultRootWindow(dpy), 5, 5, 32);
 	p->format = XRenderFindStandardFormat(dpy, PictStandardARGB32);
 	p->pict = XRenderCreatePicture(dpy, p->d, p->format, 0, NULL);
 	p->name = "target picture";

@@ -337,7 +337,7 @@ do_tests(Display *dpy, picture_info *win)
 
 	for (i = 0; i < num_dests; i++) {
 		dests[i].format = format_list[i];
-		dests[i].d = XCreatePixmap(dpy, RootWindow(dpy, 0),
+		dests[i].d = XCreatePixmap(dpy, DefaultRootWindow(dpy),
 		    win_width, win_height, dests[i].format->depth);
 		dests[i].pict = XRenderCreatePicture(dpy, dests[i].d,
 		    dests[i].format, 0, NULL);
@@ -359,8 +359,8 @@ do_tests(Display *dpy, picture_info *win)
 
 		/* The standard PictFormat numbers go from 0 to 4 */
 		pictures_1x1[i].format = format_list[i % nformats];
-		pictures_1x1[i].d = XCreatePixmap(dpy, RootWindow(dpy, 0), 1,
-		    1, pictures_1x1[i].format->depth);
+		pictures_1x1[i].d = XCreatePixmap(dpy, DefaultRootWindow(dpy),
+		    1, 1, pictures_1x1[i].format->depth);
 		pa.repeat = TRUE;
 		pictures_1x1[i].pict = XRenderCreatePicture(dpy,
 		    pictures_1x1[i].d, pictures_1x1[i].format, CPRepeat, &pa);
@@ -395,8 +395,8 @@ do_tests(Display *dpy, picture_info *win)
 
 		/* The standard PictFormat numbers go from 0 to 4 */
 		pictures_10x10[i].format = format_list[i % nformats];
-		pictures_10x10[i].d = XCreatePixmap(dpy, RootWindow(dpy, 0), 10,
-		    10, pictures_10x10[i].format->depth);
+		pictures_10x10[i].d = XCreatePixmap(dpy, DefaultRootWindow(dpy),
+		    10, 10, pictures_10x10[i].format->depth);
 		pa.repeat = TRUE;
 		pictures_10x10[i].pict = XRenderCreatePicture(dpy,
 		    pictures_10x10[i].d, pictures_10x10[i].format, 0, NULL);
@@ -416,7 +416,7 @@ do_tests(Display *dpy, picture_info *win)
 		color_correct(&pictures_10x10[i], &pictures_10x10[i].color);
 	}
 
-	picture_3x3.d = XCreatePixmap(dpy, RootWindow(dpy, 0), 3, 3, 32);
+	picture_3x3.d = XCreatePixmap(dpy, DefaultRootWindow(dpy), 3, 3, 32);
 	picture_3x3.format = XRenderFindStandardFormat(dpy, PictStandardARGB32);
 	picture_3x3.pict = XRenderCreatePicture(dpy, picture_3x3.d,
 	    picture_3x3.format, 0, NULL);
