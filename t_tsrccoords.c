@@ -89,6 +89,14 @@ trans_coords_test(Display *dpy, picture_info *win, picture_info *white,
 	XImage *image;
 	int x, y;
 
+	/* Skip this test when using indexed picture formats because
+	 * indexed color comparisons are not implemented in rendercheck
+	 * yet.
+	 */
+	if (win->format->type == PictTypeIndexed) {
+		return TRUE;
+	}
+
 	src = create_dot_picture(dpy);
 	if (src == NULL) {
 		fprintf(stderr, "couldn't allocate picture for test\n");
