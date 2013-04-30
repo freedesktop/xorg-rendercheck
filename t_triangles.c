@@ -32,6 +32,30 @@
 #define TEST_WIDTH	10
 #define TEST_HEIGHT	10
 
+
+static void
+get_dest_color (int op, color4d *in, color4d *out)
+{
+	switch (op) {
+		case PictOpSrc:
+		case PictOpClear:
+		case PictOpIn:
+		case PictOpInReverse:
+		case PictOpOut:
+		case PictOpAtopReverse:
+			out->r = 0.0;
+			out->g = 0.0;
+			out->b = 0.0;
+			out->a = 0.0;
+			break;
+
+		default:
+			*out = *in;
+			break;
+	}
+}
+
+
 /* Test basic functionality of the triangle operations.  We don't care that much
  * probably (nobody has used them yet), but we can trivially test by filling
  * doing two triangles that will exactly cover the rectangle from 2,2 to 4,4.
@@ -70,11 +94,11 @@ triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	copy_pict_to_win(dpy, dst, win, TEST_WIDTH, TEST_HEIGHT);
 
 	/* Color expected outside of the triangles */
-	tdst = dst_color->color;
+	get_dest_color(ops[op].op, &dst_color->color, &tdst);
 	color_correct(dst, &tdst);
 
 	/* Color expected inside of the triangles */
-	do_composite(ops[op].op, &src_color->color, NULL, &tdst, &tsrc, FALSE);
+	do_composite(ops[op].op, &src_color->color, NULL, &dst_color->color, &tsrc, FALSE);
 	color_correct(dst, &tsrc);
 
 	image = XGetImage(dpy, dst->d,
@@ -142,11 +166,11 @@ trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	copy_pict_to_win(dpy, dst, win, TEST_WIDTH, TEST_HEIGHT);
 
 	/* Color expected outside of the triangles */
-	tdst = dst_color->color;
+	get_dest_color(ops[op].op, &dst_color->color, &tdst);
 	color_correct(dst, &tdst);
 
 	/* Color expected inside of the triangles */
-	do_composite(ops[op].op, &src_color->color, NULL, &tdst, &tsrc, FALSE);
+	do_composite(ops[op].op, &src_color->color, NULL, &dst_color->color, &tsrc, FALSE);
 	color_correct(dst, &tsrc);
 
 	image = XGetImage(dpy, dst->d,
@@ -214,11 +238,11 @@ tristrip_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	copy_pict_to_win(dpy, dst, win, TEST_WIDTH, TEST_HEIGHT);
 
 	/* Color expected outside of the triangles */
-	tdst = dst_color->color;
+	get_dest_color(ops[op].op, &dst_color->color, &tdst);
 	color_correct(dst, &tdst);
 
 	/* Color expected inside of the triangles */
-	do_composite(ops[op].op, &src_color->color, NULL, &tdst, &tsrc, FALSE);
+	do_composite(ops[op].op, &src_color->color, NULL, &dst_color->color, &tsrc, FALSE);
 	color_correct(dst, &tsrc);
 
 	image = XGetImage(dpy, dst->d,
