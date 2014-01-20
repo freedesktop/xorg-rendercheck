@@ -206,10 +206,6 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     Bool test_mask);
 
 Bool
-linear_gradient_test(Display *dpy, picture_info *win,
-    picture_info *dst, int op, picture_info *dst_color);
-
-Bool
 triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     picture_info *src_color, picture_info *dst_color);
 

@@ -27,9 +27,6 @@
 #include <strings.h>
 #include <getopt.h>
 
-extern int num_ops;
-extern int num_colors;
-
 Bool is_verbose = FALSE, minimalrendering = FALSE;
 int enabled_tests = ~0;		/* Enable all tests by default */
 

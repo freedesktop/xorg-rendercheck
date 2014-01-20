@@ -390,14 +390,12 @@ do_tests(Display *dpy, picture_info *win)
 		errx(1, "malloc error");
 
 	for (i = 0; i < num_colors * nformats; i++) {
-		XRenderPictureAttributes pa;
 		color4d *c = &colors[i / nformats];
 
 		/* The standard PictFormat numbers go from 0 to 4 */
 		pictures_10x10[i].format = format_list[i % nformats];
 		pictures_10x10[i].d = XCreatePixmap(dpy, DefaultRootWindow(dpy),
 		    10, 10, pictures_10x10[i].format->depth);
-		pa.repeat = TRUE;
 		pictures_10x10[i].pict = XRenderCreatePicture(dpy,
 		    pictures_10x10[i].d, pictures_10x10[i].format, 0, NULL);
 

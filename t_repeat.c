@@ -49,7 +49,7 @@ Bool
 repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     picture_info *dst_color, picture_info *c1, picture_info *c2, Bool test_mask)
 {
-	int wi, hi;
+	unsigned int wi, hi;
 
 	for (wi = 0; wi < sizeof(sizes) / sizeof(int); wi++) {
 	    int w = sizes[wi];
