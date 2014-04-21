@@ -96,7 +96,7 @@ extern int num_colors;
 
 /* main.c */
 void
-describe_format(char *desc, int len, XRenderPictFormat *format);
+describe_format(char **desc, const char *prefix, XRenderPictFormat *format);
 
 int
 bit_count(int i);

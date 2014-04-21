@@ -252,7 +252,7 @@ create_formats_list(Display *dpy)
 
     argb32index = -1;
     for (i = 0; ; i++) {
-	char name[20];
+	char *name;
 	int alphabits, redbits;
 
 	if (nformats + 1 == nformats_allocated) {
@@ -280,7 +280,7 @@ create_formats_list(Display *dpy)
 	    continue;
 	}
 
-	describe_format(name, 20, format_list[nformats]);
+	describe_format(&name, NULL, format_list[nformats]);
 
 	if (format_whitelist_len != 0) {
 	    Bool ok = FALSE;
@@ -342,10 +342,7 @@ do_tests(Display *dpy, picture_info *win)
 		dests[i].pict = XRenderCreatePicture(dpy, dests[i].d,
 		    dests[i].format, 0, NULL);
 
-		dests[i].name = (char *)malloc(20);
-		if (dests[i].name == NULL)
-			errx(1, "malloc error");
-		describe_format(dests[i].name, 20, dests[i].format);
+		describe_format(&dests[i].name, NULL, dests[i].format);
 	}
 
 	pictures_1x1 = (picture_info *)malloc(num_colors * nformats *
@@ -365,13 +362,8 @@ do_tests(Display *dpy, picture_info *win)
 		pictures_1x1[i].pict = XRenderCreatePicture(dpy,
 		    pictures_1x1[i].d, pictures_1x1[i].format, CPRepeat, &pa);
 
-		pictures_1x1[i].name = (char *)malloc(20);
-		if (pictures_1x1[i].name == NULL)
-			errx(1, "malloc error");
-		sprintf(pictures_1x1[i].name, "1x1R ");
-		describe_format(pictures_1x1[i].name +
-		    strlen(pictures_1x1[i].name), 20 -
-		    strlen(pictures_1x1[i].name), pictures_1x1[i].format);
+		describe_format(&pictures_1x1[i].name, "1x1R ",
+		    pictures_1x1[i].format);
 
 		argb_fill(dpy, &pictures_1x1[i], 0, 0, 1, 1,
 		    c->a, c->r, c->g, c->b);
@@ -399,13 +391,8 @@ do_tests(Display *dpy, picture_info *win)
 		pictures_10x10[i].pict = XRenderCreatePicture(dpy,
 		    pictures_10x10[i].d, pictures_10x10[i].format, 0, NULL);
 
-		pictures_10x10[i].name = (char *)malloc(20);
-		if (pictures_10x10[i].name == NULL)
-			errx(1, "malloc error");
-		sprintf(pictures_10x10[i].name, "10x10 ");
-		describe_format(pictures_10x10[i].name +
-		    strlen(pictures_10x10[i].name), 20 -
-		    strlen(pictures_10x10[i].name), pictures_10x10[i].format);
+		describe_format(&pictures_10x10[i].name, "10x10 ",
+		    pictures_10x10[i].format);
 
 		argb_fill(dpy, &pictures_10x10[i], 0, 0, 10, 10,
 		    c->a, c->r, c->g, c->b);

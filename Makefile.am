@@ -20,6 +20,7 @@ rendercheck_SOURCES = \
 	t_triangles.c
 
 AM_CFLAGS = $(RC_CFLAGS) $(CWARNFLAGS)
+AM_CPPFLAGS = -D_GNU_SOURCE
 rendercheck_LDADD = $(RC_LIBS)
 
 MAINTAINERCLEANFILES = ChangeLog INSTALL

@@ -21,6 +21,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "rendercheck.h"
 
@@ -109,10 +110,10 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst,
 					    color_correct(dst, &expected);
 
 					    if (eval_diff(&acc, &expected, &tested) > 3.) {
-						    char srcformat[20];
+						    char *srcformat;
 
 						    snprintf(testname, 20, "%s blend", ops[op[i]].name);
-						    describe_format(srcformat, 20, src_color[j]->format);
+						    describe_format(&srcformat, NULL, src_color[j]->format);
 						    print_fail(testname, &expected, &tested, 0, 0,
 							       eval_diff(&acc, &expected, &tested));
 						    printf("src color: %.2f %.2f %.2f %.2f (%s)\n"
@@ -125,6 +126,7 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst,
 							   dst_color[k]->color.b,
 							   dst_color[k]->color.a);
 						    printf("src: %s, dst: %s\n", src_color[j]->name, dst->name);
+						    free(srcformat);
 						    return FALSE;
 					    }
 				    }

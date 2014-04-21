@@ -55,11 +55,14 @@ bit_count(int i)
 
 /* This is not complete, but decent enough for now.*/
 void
-describe_format(char *desc, int len, XRenderPictFormat *format)
+describe_format(char **desc, const char *prefix, XRenderPictFormat *format)
 {
 	char ad[4] = "", rd[4] = "", gd[4] = "", bd[4] = "";
 	int ac, rc, gc, bc;
 	int ashift;
+
+	if (!prefix)
+	    prefix = "";
 
 	ac = bit_count(format->direct.alphaMask);
 	rc = bit_count(format->direct.redMask);
@@ -90,14 +93,14 @@ describe_format(char *desc, int len, XRenderPictFormat *format)
 
 	if (ashift > format->direct.red) {
 		if (format->direct.red > format->direct.blue)
-			snprintf(desc, len, "%s%s%s%s", ad, rd, gd, bd);
+			asprintf(desc, "%s%s%s%s%s", prefix, ad, rd, gd, bd);
 		else
-			snprintf(desc, len, "%s%s%s%s", ad, bd, gd, rd);
+			asprintf(desc, "%s%s%s%s%s", prefix, ad, bd, gd, rd);
 	} else {
 		if (format->direct.red > format->direct.blue)
-			snprintf(desc, len, "%s%s%s%s", rd, gd, bd, ad);
+			asprintf(desc, "%s%s%s%s%s", prefix, rd, gd, bd, ad);
 		else
-			snprintf(desc, len, "%s%s%s%s", bd, gd, rd, ad);
+			asprintf(desc, "%s%s%s%s%s", prefix, bd, gd, rd, ad);
 	}
 }
 
@@ -297,12 +300,10 @@ int main(int argc, char **argv)
 	window.format = XRenderFindVisualFormat(dpy, a.visual);
 	window.pict = XRenderCreatePicture(dpy, window.d,
 	    window.format, 0, NULL);
-	window.name = (char *)malloc(20);
-	if (window.name == NULL)
-		errx(1, "malloc error");
-	describe_format(window.name, 20, window.format);
-	printf("Window format: %s\n", window.name);
-	strncat(window.name, " window", 20);
+	describe_format(&format, NULL, window.format);
+	printf("Window format: %s\n", format);
+	asprintf(&window.name, "%s window", format);
+	free(format);
 	XSelectInput(dpy, window.d, ExposureMask);
 	XMapWindow(dpy, window.d);
 

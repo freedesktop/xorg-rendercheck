@@ -21,6 +21,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "rendercheck.h"
@@ -32,16 +33,16 @@ Bool
 fill_test(Display *dpy, picture_info *win, picture_info *src)
 {
 	color4d tested;
-	char name[20];
+	char *name;
 
 	get_pixel(dpy, src, 0, 0, &tested);
 	copy_pict_to_win(dpy, src, win, win_width, win_height);
 
 	if (eval_diff(&src->format->direct, &src->color, &tested) > 2.) {
-	    strcpy(name, "fill ");
-	    describe_format(name, 20 - strlen(name), src->format);
+	    describe_format(&name, "fill ", src->format);
 	    print_fail(name, &src->color, &tested, 0, 0,
 		       eval_diff(&src->format->direct, &src->color, &tested));
+	    free(name);
 	    return FALSE;
 	}
 
