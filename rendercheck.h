@@ -64,7 +64,7 @@ typedef struct _picture_info {
 
 struct op_info {
 	int op;
-	char *name;
+	const char *name;
 	Bool disabled;
 };
 
