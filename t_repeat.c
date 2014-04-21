@@ -73,7 +73,7 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		src.format = XRenderFindStandardFormat(dpy, PictStandardARGB32);
 		src.pict = XRenderCreatePicture(dpy, src.d, src.format,
 		    CPComponentAlpha | CPRepeat, &pa);
-		src.name = "repeat picture";
+		src.name = (char *)"repeat picture";
 
 		/* Fill to the first color */
 		XRenderComposite(dpy, PictOpSrc, c1->pict, None, src.pict,

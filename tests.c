@@ -405,7 +405,7 @@ do_tests(Display *dpy, picture_info *win)
 	picture_3x3.format = XRenderFindStandardFormat(dpy, PictStandardARGB32);
 	picture_3x3.pict = XRenderCreatePicture(dpy, picture_3x3.d,
 	    picture_3x3.format, 0, NULL);
-	picture_3x3.name = "3x3 sample picture";
+	picture_3x3.name = (char *)"3x3 sample picture";
 	for (i = 0; i < 9; i++) {
 		int x = i % 3;
 		int y = i / 3;
@@ -424,7 +424,7 @@ do_tests(Display *dpy, picture_info *win)
             c.blue = (int)(colors[i].b*65535);
             pictures_solid[i].pict = XRenderCreateSolidFill(dpy, &c);
             pictures_solid[i].format = format_list[argb32index];
-            pictures_solid[i].name = "Solid";
+            pictures_solid[i].name = (char *)"Solid";
         }
 
 #define RECORD_RESULTS()					\
