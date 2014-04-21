@@ -121,6 +121,7 @@ struct {
     {TEST_REPEAT, "repeat"},
     {TEST_TRIANGLES, "triangles"},
     {TEST_BUG7366, "bug7366"},
+    {TEST_GTK_ARGB_XBGR, "gtk_argb_xbgr"},
     {0, NULL}
 };
 

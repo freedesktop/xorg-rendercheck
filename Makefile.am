@@ -13,6 +13,7 @@ rendercheck_SOURCES = \
 	t_dstcoords.c \
 	t_fill.c \
 	t_gradient.c \
+	t_gtk_argb_xbgr.c \
 	t_repeat.c \
 	t_srccoords.c \
 	t_tsrccoords.c \

@@ -732,6 +732,16 @@ do {								\
 		success_mask |= TEST_BUG7366;
 	}
 
+        if (enabled_tests & TEST_GTK_ARGB_XBGR) {
+		Bool ok, group_ok = TRUE;
+
+		ok = gtk_argb_xbgr_test(dpy);
+		RECORD_RESULTS();
+
+		if (group_ok)
+			success_mask |= TEST_GTK_ARGB_XBGR;
+	}
+
 	free(test_ops);
 	free(test_src);
 	free(test_mask);
