@@ -742,6 +742,19 @@ do {								\
 			success_mask |= TEST_GTK_ARGB_XBGR;
 	}
 
+        if (enabled_tests & TEST_LIBREOFFICE_XRGB) {
+		Bool ok, group_ok = TRUE;
+
+		ok = libreoffice_xrgb_test(dpy, FALSE);
+		RECORD_RESULTS();
+
+		ok = libreoffice_xrgb_test(dpy, TRUE);
+		RECORD_RESULTS();
+
+		if (group_ok)
+			success_mask |= TEST_LIBREOFFICE_XRGB;
+	}
+
 	free(test_ops);
 	free(test_src);
 	free(test_mask);

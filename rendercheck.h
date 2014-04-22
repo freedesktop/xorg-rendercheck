@@ -82,6 +82,7 @@ struct op_info {
 #define TEST_TRIANGLES  	0x0800
 #define TEST_BUG7366		0x1000
 #define TEST_GTK_ARGB_XBGR	0x2000
+#define TEST_LIBREOFFICE_XRGB	0x4000
 
 extern int pixmap_move_iter;
 extern int win_width, win_height;
@@ -223,3 +224,6 @@ bug7366_test(Display *dpy);
 
 Bool
 gtk_argb_xbgr_test(Display *dpy);
+
+Bool
+libreoffice_xrgb_test(Display *dpy, Bool invert);
