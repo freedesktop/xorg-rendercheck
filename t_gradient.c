@@ -162,7 +162,7 @@ render_to_gradient_test(Display *dpy, picture_info *src)
 static void gradientPixel(const stop *stops, double pos, unsigned int spread, color4d *result)
 {
     const int PRECISION = 1<<16;
-    int ipos = pos * PRECISION - 1;
+    int ipos = (pos + 0.05) * PRECISION - 1;
     int i;
     double frac;
 
