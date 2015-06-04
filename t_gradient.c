@@ -293,7 +293,7 @@ Bool linear_gradient_test(Display *dpy, picture_info *win,
 
                 pix = test_pixels;
                 while (pix->x >= 0) {
-
+                    XRenderDirectFormat acc;
                     get_pixel(dpy, dst, pix->x, pix->y, &tested);
 
                     calculate_linear_gradient_color(pix->x, pix->y, &linear_gradient_points[p],
@@ -305,7 +305,9 @@ Bool linear_gradient_test(Display *dpy, picture_info *win,
                                  &expected, False);
                     color_correct(dst, &expected);
 
-                    if (eval_diff(&dst->format->direct, &expected, &tested) > 3.) {
+                    accuracy(&acc, &dst->format->direct, &dst_color->format->direct);
+
+                    if (eval_diff(&acc, &expected, &tested) > 3.) {
 			snprintf(testname, 40,
 				 "%s linear gradient", ops[op].name);
 			print_fail(testname, &expected, &tested, 0, 0,
