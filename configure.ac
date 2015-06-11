@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.60)
 AC_INIT([rendercheck],
-        [1.4],
+        [1.5],
         [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],
         [rendercheck])
 
