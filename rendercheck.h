@@ -80,6 +80,14 @@ struct op_info {
 #define TEST_GTK_ARGB_XBGR	0x2000
 #define TEST_LIBREOFFICE_XRGB	0x4000
 
+struct render_format {
+	XRenderPictFormat *format;
+	char *name;
+};
+
+extern struct render_format *formats;
+extern int nformats;
+
 extern int pixmap_move_iter;
 extern int win_width, win_height;
 extern struct op_info ops[];

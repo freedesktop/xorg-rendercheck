@@ -27,8 +27,8 @@
 
 #include "rendercheck.h"
 
-static XRenderPictFormat **format_list;
-static int nformats;
+struct render_format *formats;
+int nformats;
 static int argb32index;
 
 /* Note: changing the order of these colors may disrupt tests that depend on
@@ -240,36 +240,35 @@ create_formats_list(Display *dpy)
 {
     int i;
     int nformats_allocated = 5;
-    XRenderPictFormat templ;
+    XRenderPictFormat templ, *format;
 
     memset(&templ, 0, sizeof(templ));
     templ.type = PictTypeDirect;
 
-    format_list = malloc(sizeof(XRenderPictFormat *) * nformats_allocated);
-    if (format_list == NULL)
+    formats = malloc(sizeof(*formats) * nformats_allocated);
+    if (formats == NULL)
 	errx(1, "malloc error");
     nformats = 0;
 
     argb32index = -1;
     for (i = 0; ; i++) {
-	char *name;
 	int alphabits, redbits;
 
 	if (nformats + 1 == nformats_allocated) {
 	    nformats_allocated *= 2;
-	    format_list = realloc(format_list, sizeof(XRenderPictFormat *) *
-		nformats_allocated);
-	    if (format_list == NULL)
+	    formats = realloc(formats, sizeof(*formats) * nformats_allocated);
+	    if (formats == NULL)
 		errx(1, "realloc error");
 	}
 
-	format_list[nformats] = XRenderFindFormat(dpy, PictFormatType, &templ,
-	    i);
-	if (format_list[nformats] == NULL)
-	    break;
+	format = XRenderFindFormat(dpy, PictFormatType, &templ, i);
+	if (!format)
+		break;
 
-	alphabits = bit_count(format_list[nformats]->direct.alphaMask);
-	redbits = bit_count(format_list[nformats]->direct.redMask);
+	formats[nformats].format = format;
+
+	alphabits = bit_count(format->direct.alphaMask);
+	redbits = bit_count(format->direct.redMask);
 
 	/* Our testing code isn't all that hot, so don't bother trying at
 	 * the low depths yet.
@@ -280,31 +279,33 @@ create_formats_list(Display *dpy)
 	    continue;
 	}
 
-	describe_format(&name, NULL, format_list[nformats]);
+	describe_format(&formats[nformats].name, NULL, format);
 
 	if (format_whitelist_len != 0) {
 	    bool ok = false;
 	    int j;
 
 	    for (j = 0; j < format_whitelist_len; j++) {
-		if (strcmp(format_whitelist[j], name) == 0) {
+		if (strcmp(format_whitelist[j], formats[nformats].name) == 0) {
 		    ok = true;
 		    break;
 		}
 	    }
 	    if (!ok) {
-		printf("Ignoring server-supported format: %s\n", name);
+		printf("Ignoring server-supported format: %s\n",
+		       formats[nformats].name);
+		free(formats[nformats].name);
+		formats[nformats].name = NULL;
 		continue;
 	    }
 	}
 
-	if (format_list[nformats] == XRenderFindStandardFormat(dpy,
-	    PictStandardARGB32))
+	if (format == XRenderFindStandardFormat(dpy, PictStandardARGB32))
 	{
 	    argb32index = nformats;
 	}
 
-	printf("Found server-supported format: %s\n", name);
+	printf("Found server-supported format: %s\n", formats[nformats].name);
 
 	nformats++;
     }
@@ -336,7 +337,7 @@ do_tests(Display *dpy, picture_info *win)
 		errx(1, "malloc error");
 
 	for (i = 0; i < num_dests; i++) {
-		dests[i].format = format_list[i];
+		dests[i].format = formats[i].format;
 		dests[i].d = XCreatePixmap(dpy, DefaultRootWindow(dpy),
 		    win_width, win_height, dests[i].format->depth);
 		dests[i].pict = XRenderCreatePicture(dpy, dests[i].d,
@@ -355,7 +356,7 @@ do_tests(Display *dpy, picture_info *win)
 		color4d *c = &colors[i / nformats];
 
 		/* The standard PictFormat numbers go from 0 to 4 */
-		pictures_1x1[i].format = format_list[i % nformats];
+		pictures_1x1[i].format = formats[i % nformats].format;
 		pictures_1x1[i].d = XCreatePixmap(dpy, DefaultRootWindow(dpy),
 		    1, 1, pictures_1x1[i].format->depth);
 		pa.repeat = true;
@@ -385,7 +386,7 @@ do_tests(Display *dpy, picture_info *win)
 		color4d *c = &colors[i / nformats];
 
 		/* The standard PictFormat numbers go from 0 to 4 */
-		pictures_10x10[i].format = format_list[i % nformats];
+		pictures_10x10[i].format = formats[i % nformats].format;
 		pictures_10x10[i].d = XCreatePixmap(dpy, DefaultRootWindow(dpy),
 		    10, 10, pictures_10x10[i].format->depth);
 		pictures_10x10[i].pict = XRenderCreatePicture(dpy,
@@ -423,7 +424,7 @@ do_tests(Display *dpy, picture_info *win)
             c.green = (int)(colors[i].g*65535);
             c.blue = (int)(colors[i].b*65535);
             pictures_solid[i].pict = XRenderCreateSolidFill(dpy, &c);
-            pictures_solid[i].format = format_list[argb32index];
+            pictures_solid[i].format = formats[argb32index].format;
             pictures_solid[i].name = (char *)"Solid";
         }
 
