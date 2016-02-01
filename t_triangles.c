@@ -60,14 +60,14 @@ get_dest_color (int op, color4d *in, color4d *out)
  * probably (nobody has used them yet), but we can trivially test by filling
  * doing two triangles that will exactly cover the rectangle from 2,2 to 4,4.
  */
-Bool
+bool
 triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     picture_info *src_color, picture_info *dst_color)
 {
 	XTriangle triangles[2];
 	color4d tdst, tsrc;
 	int x, y;
-	Bool success = TRUE;
+	bool success = true;
 	XImage *image;
 
 	triangles[0].p1.x = XDoubleToFixed(2);
@@ -98,7 +98,7 @@ triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	color_correct(dst, &tdst);
 
 	/* Color expected inside of the triangles */
-	do_composite(ops[op].op, &src_color->color, NULL, &dst_color->color, &tsrc, FALSE);
+	do_composite(ops[op].op, &src_color->color, NULL, &dst_color->color, &tsrc, false);
 	color_correct(dst, &tsrc);
 
 	image = XGetImage(dpy, dst->d,
@@ -120,7 +120,7 @@ triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		if (eval_diff(&dst->format->direct, &expected, &tested) > 2.) {
 		    print_fail("triangles", &expected, &tested, x, y,
 			       eval_diff(&dst->format->direct, &expected, &tested));
-		    success = FALSE;
+		    success = false;
 		}
 	    }
 	}
@@ -137,14 +137,14 @@ triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	return success;
 }
 
-Bool
+bool
 trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     picture_info *src_color, picture_info *dst_color)
 {
 	XPointFixed points[4];
 	color4d tdst, tsrc;
 	int x, y;
-	Bool success = TRUE;
+	bool success = true;
 	XImage *image;
 
 	points[0].x = XDoubleToFixed(2);
@@ -170,7 +170,7 @@ trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	color_correct(dst, &tdst);
 
 	/* Color expected inside of the triangles */
-	do_composite(ops[op].op, &src_color->color, NULL, &dst_color->color, &tsrc, FALSE);
+	do_composite(ops[op].op, &src_color->color, NULL, &dst_color->color, &tsrc, false);
 	color_correct(dst, &tsrc);
 
 	image = XGetImage(dpy, dst->d,
@@ -192,7 +192,7 @@ trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		if (eval_diff(&dst->format->direct, &expected, &tested) > 2.) {
 			print_fail("triangles", &expected, &tested, x,y,
 				   eval_diff(&dst->format->direct, &expected, &tested));
-			success = FALSE;
+			success = false;
 		}
 	    }
 	}
@@ -209,14 +209,14 @@ trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	return success;
 }
 
-Bool
+bool
 tristrip_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     picture_info *src_color, picture_info *dst_color)
 {
 	XPointFixed points[4];
 	color4d tdst, tsrc;
 	int x, y;
-	Bool success = TRUE;
+	bool success = true;
 	XImage *image;
 
 	points[0].x = XDoubleToFixed(2);
@@ -242,7 +242,7 @@ tristrip_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 	color_correct(dst, &tdst);
 
 	/* Color expected inside of the triangles */
-	do_composite(ops[op].op, &src_color->color, NULL, &dst_color->color, &tsrc, FALSE);
+	do_composite(ops[op].op, &src_color->color, NULL, &dst_color->color, &tsrc, false);
 	color_correct(dst, &tsrc);
 
 	image = XGetImage(dpy, dst->d,
@@ -264,7 +264,7 @@ tristrip_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		if (eval_diff(&dst->format->direct, &expected, &tested) > 2.) {
 		    print_fail("triangles", &expected, &tested, x, y,
 			       eval_diff(&dst->format->direct, &expected, &tested));
-		    success = FALSE;
+		    success = false;
 		}
 	    }
 	}

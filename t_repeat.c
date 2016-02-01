@@ -45,9 +45,9 @@ static const int sizes[] = {1, 2, 4, 8, 10, 16, 20, 32, 64, 100};
  * test_mask is set, the repeating picture is used as a component-alpha mask,
  * with argb32white as the source.
  */
-Bool
+bool
 repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
-    picture_info *dst_color, picture_info *c1, picture_info *c2, Bool test_mask)
+    picture_info *dst_color, picture_info *c1, picture_info *c2, bool test_mask)
 {
 	unsigned int wi, hi;
 
@@ -64,10 +64,10 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 		XRenderPictureAttributes pa;
 		XRenderDirectFormat acc;
 		XImage *image;
-		Bool failed = FALSE;
+		bool failed = false;
 
 		pa.component_alpha = test_mask;
-		pa.repeat = TRUE;
+		pa.repeat = true;
 
 		src.d = XCreatePixmap(dpy, DefaultRootWindow(dpy), w, h, 32);
 		src.format = XRenderFindStandardFormat(dpy, PictStandardARGB32);
@@ -118,14 +118,14 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 
 		if (!test_mask) {
 			do_composite(ops[op].op, &c1->color, NULL, &tdst,
-			    &c1expected, FALSE);
+			    &c1expected, false);
 			do_composite(ops[op].op, &c2->color, NULL, &tdst,
-			    &c2expected, FALSE);
+			    &c2expected, false);
 		} else {
 			do_composite(ops[op].op, &argb32white->color,
-			    &c1->color, &tdst, &c1expected, TRUE);
+			    &c1->color, &tdst, &c1expected, true);
 			do_composite(ops[op].op, &argb32white->color,
-			    &c2->color, &tdst, &c2expected, TRUE);
+			    &c2->color, &tdst, &c2expected, true);
 		}
 		color_correct(dst, &c1expected);
 		color_correct(dst, &c2expected);
@@ -154,7 +154,7 @@ repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 			    print_fail(name, expected, &tested, x, y,
 				       eval_diff(&acc, expected, &tested));
 
-			    failed = TRUE;
+			    failed = true;
 			    goto out;
 			}
 		    }
@@ -165,8 +165,8 @@ out:
 		XFreePixmap(dpy, src.d);
 
 		if (failed)
-		    return FALSE;
+		    return false;
 	    }
 	}
-	return TRUE;
+	return true;
 }

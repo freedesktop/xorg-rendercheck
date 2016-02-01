@@ -22,6 +22,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrender.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 #if HAVE_ERR_H
@@ -44,11 +45,6 @@ static inline void errx(int eval, const char *fmt, ...) {
 #define min(a, b) (a < b ? a : b)
 #define max(a, b) (a > b ? a : b)
 
-#ifndef TRUE
-#define TRUE 1
-#define FALSE 0
-#endif
-
 typedef struct _color4d
 {
 	double r, g, b, a;
@@ -65,7 +61,7 @@ typedef struct _picture_info {
 struct op_info {
 	int op;
 	const char *name;
-	Bool disabled;
+	bool disabled;
 };
 
 #define TEST_FILL		0x0001
@@ -87,7 +83,7 @@ struct op_info {
 extern int pixmap_move_iter;
 extern int win_width, win_height;
 extern struct op_info ops[];
-extern Bool is_verbose, minimalrendering;
+extern bool is_verbose, minimalrendering;
 extern color4d colors[];
 extern int enabled_tests;
 extern int format_whitelist_len;
@@ -147,7 +143,7 @@ void
 argb_fill(Display *dpy, picture_info *p, int x, int y, int w, int h, float a,
     float r, float g, float b);
 
-Bool
+bool
 do_tests(Display *dpy, picture_info *win);
 
 void
@@ -161,69 +157,69 @@ do_composite(int op,
 	     const color4d *mask,
 	     const color4d *dst,
 	     color4d *result,
-	     Bool componentAlpha);
+	     bool componentAlpha);
 
 /* The tests */
-Bool
+bool
 blend_test(Display *dpy, picture_info *win, picture_info *dst,
 	   const int *op, int num_op,
 	   const picture_info **src_color, int num_src,
 	   const picture_info **dst_color, int num_dst);
 
-Bool
+bool
 composite_test(Display *dpy, picture_info *win, picture_info *dst,
 	       const int *op, int num_op,
 	       const picture_info **src_color, int num_src,
 	       const picture_info **mask_color, int num_mask,
 	       const picture_info **dst_color, int num_dst,
-	       Bool componentAlpha);
+	       bool componentAlpha);
 
-Bool
+bool
 dstcoords_test(Display *dpy, picture_info *win, int op, picture_info *dst,
     picture_info *bg, picture_info *fg);
 
-Bool
+bool
 fill_test(Display *dpy, picture_info *win, picture_info *src);
 
-Bool
+bool
 srccoords_test(Display *dpy, picture_info *win, picture_info *white,
-    Bool test_mask);
+    bool test_mask);
 
-Bool
+bool
 trans_coords_test(Display *dpy, picture_info *win, picture_info *white,
-    Bool test_mask);
+    bool test_mask);
 
-Bool
+bool
 trans_srccoords_test_2(Display *dpy, picture_info *win, picture_info *white,
-    Bool test_mask);
+    bool test_mask);
 
-Bool render_to_gradient_test(Display *dpy, picture_info *src);
+bool render_to_gradient_test(Display *dpy, picture_info *src);
 
-Bool linear_gradient_test(Display *dpy, picture_info *win,
+bool linear_gradient_test(Display *dpy, picture_info *win,
                           picture_info *dst, int op, picture_info *dst_color);
 
-Bool
+bool
 repeat_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     picture_info *dst_color, picture_info *c1, picture_info *c2,
-    Bool test_mask);
+    bool test_mask);
 
-Bool
+bool
 triangles_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     picture_info *src_color, picture_info *dst_color);
 
-Bool
+bool
 tristrip_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     picture_info *src_color, picture_info *dst_color);
 
-Bool
+bool
 trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
     picture_info *src_color, picture_info *dst_color);
 
-Bool
+bool
 bug7366_test(Display *dpy);
 
-Bool
+bool
 gtk_argb_xbgr_test(Display *dpy);
 
-Bool
-libreoffice_xrgb_test(Display *dpy, Bool invert);
+bool
+libreoffice_xrgb_test(Display *dpy, bool invert);

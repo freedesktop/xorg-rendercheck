@@ -33,14 +33,14 @@
  * Otherwise, we're likely to hit a path that maps PictOpOver -> PictOpSrc,
  * for example.
  */
-Bool
+bool
 dstcoords_test(Display *dpy, picture_info *win, int op, picture_info *dst,
     picture_info *bg, picture_info *fg)
 {
 	color4d expected, tested;
 	XImage *image;
 	int x, y, i;
-	Bool failed = FALSE;
+	bool failed = false;
 
 	for (i = 0; i < pixmap_move_iter; i++) {
 		XRenderComposite(dpy, PictOpSrc, bg->pict, 0, dst->pict, 0, 0,
@@ -68,7 +68,7 @@ dstcoords_test(Display *dpy, picture_info *win, int op, picture_info *dst,
 			    print_fail("dst coords",
 				       &expected, &tested, x, y,
 				       eval_diff(&dst->format->direct, &expected, &tested));
-				failed = TRUE;
+				failed = true;
 			}
 		}
 	}

@@ -210,7 +210,7 @@ do_composite(int op,
 	     const color4d *mask,
 	     const color4d *dst,
 	     color4d *result,
-	     Bool componentAlpha)
+	     bool componentAlpha)
 {
 	color4d srcval, srcalpha;
 

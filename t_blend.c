@@ -26,7 +26,7 @@
 #include "rendercheck.h"
 
 /* Test a composite of a given operation, source, and destination picture.  */
-Bool
+bool
 blend_test(Display *dpy, picture_info *win, picture_info *dst,
 	   const int *op, int num_op,
 	   const picture_info **src_color, int num_src,
@@ -106,7 +106,7 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst,
 							 NULL,
 							 &tdst,
 							 &expected,
-							 FALSE);
+							 false);
 					    color_correct(dst, &expected);
 
 					    if (eval_diff(&acc, &expected, &tested) > 3.) {
@@ -127,7 +127,7 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst,
 							   dst_color[k]->color.a);
 						    printf("src: %s, dst: %s\n", src_color[j]->name, dst->name);
 						    free(srcformat);
-						    return FALSE;
+						    return false;
 					    }
 				    }
 				    y++;
@@ -139,5 +139,5 @@ blend_test(Display *dpy, picture_info *win, picture_info *dst,
 	    }
 	}
 
-	return TRUE;
+	return true;
 }

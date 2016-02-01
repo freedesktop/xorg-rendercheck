@@ -31,7 +31,7 @@
 #define PIXEL_ABGR	0xff886644
 #define PIXEL_RGB	0x446688
 
-Bool
+bool
 gtk_argb_xbgr_test(Display *dpy)
 {
 	int x, y;
@@ -95,7 +95,7 @@ gtk_argb_xbgr_test(Display *dpy)
 
 	if (!pic_argb_format || !pic_xbgr_format || !pic_rgb_format) {
 		printf("Couldn't find xBGR and ARGB formats\n");
-		return FALSE;
+		return false;
 	}
 
 	pix_32 = XCreatePixmap(dpy, RootWindow(dpy, DefaultScreen(dpy)),
@@ -141,10 +141,10 @@ gtk_argb_xbgr_test(Display *dpy)
 				printf("fail: pixel value is %08lx "
 				    "should be %08x\n",
 				    pixel, PIXEL_RGB);
-				return FALSE;
+				return false;
 			}
 		}
 	}
 
-	return TRUE;
+	return true;
 }

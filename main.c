@@ -27,7 +27,7 @@
 #include <strings.h>
 #include <getopt.h>
 
-Bool is_verbose = FALSE, minimalrendering = FALSE;
+bool is_verbose = false, minimalrendering = false;
 int enabled_tests = ~0;		/* Enable all tests by default */
 
 int format_whitelist_len = 0;
@@ -163,7 +163,8 @@ int main(int argc, char **argv)
 	Display *dpy;
 	XEvent ev;
 	int i, o, maj, min;
-	static Bool is_sync = FALSE, print_version = FALSE;
+	static int is_sync = false, print_version = false;
+	static int longopt_minimalrendering = 0;
 	XWindowAttributes a;
 	XSetWindowAttributes as;
 	picture_info window;
@@ -177,10 +178,10 @@ int main(int argc, char **argv)
 		{ "tests",	required_argument,	NULL,	't' },
 		{ "ops",	required_argument,	NULL,	'o' },
 		{ "verbose",	no_argument,		NULL,	'v' },
-		{ "sync",	no_argument,		&is_sync, TRUE},
-		{ "minimalrendering", no_argument,	&minimalrendering,
-		    TRUE},
-		{ "version",	no_argument,		&print_version, TRUE },
+		{ "sync",	no_argument,		&is_sync, true},
+		{ "minimalrendering", no_argument,
+		  &longopt_minimalrendering, true},
+		{ "version",	no_argument,		&print_version, true },
 		{ NULL,		0,			NULL,	0 }
 	};
 
@@ -194,7 +195,7 @@ int main(int argc, char **argv)
 			break;
 		case 'o':
 			for (i = 0; i < num_ops; i++)
-				ops[i].disabled = TRUE;
+				ops[i].disabled = true;
 
 			nextname = optarg;
 			while ((opname = strsep(&nextname, ",")) != NULL) {
@@ -202,7 +203,7 @@ int main(int argc, char **argv)
 					if (strcasecmp(ops[i].name, opname) !=
 					    0)
 						continue;
-					ops[i].disabled = FALSE;
+					ops[i].disabled = false;
 					break;
 				}
 				if (i == num_ops)
@@ -252,7 +253,7 @@ int main(int argc, char **argv)
 
 			break;
 		case 'v':
-			is_verbose = TRUE;
+			is_verbose = true;
 			break;
 		case 0:
 			break;
@@ -261,6 +262,8 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
+
+	minimalrendering = longopt_minimalrendering;
 
 	/* Print the version string.  Bail out if --version was requested and
 	 * continue otherwise.

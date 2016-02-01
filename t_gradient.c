@@ -85,20 +85,20 @@ static const pixel test_pixels [] = {
 
 static const int n_linear_gradient_points = sizeof(linear_gradient_points)/(2*sizeof(point));
 
-static Bool got_bad_drawable;
+static bool got_bad_drawable;
 
 static int expecting_bad_drawable(Display *dpy, XErrorEvent *event)
 {
 	if (event->error_code == BadDrawable)
-		got_bad_drawable = TRUE;
+		got_bad_drawable = true;
 
-	return TRUE;
+	return true;
 }
 
 
 /* Tests that rendering to a linear gradient returns an error as expected.
  */
-Bool
+bool
 render_to_gradient_test(Display *dpy, picture_info *src)
 {
 	XLinearGradient g;
@@ -124,39 +124,39 @@ render_to_gradient_test(Display *dpy, picture_info *src)
 	gradient = XRenderCreateLinearGradient(dpy, &g, stops, colors, i);
 
 	/* Clear out any failing requests before our expected to fail ones. */
-	XSync(dpy, FALSE);
+	XSync(dpy, false);
 
-	got_bad_drawable = FALSE;
+	got_bad_drawable = false;
 	XSetErrorHandler(expecting_bad_drawable);
 
 	/* Try a real compositing path */
 	XRenderComposite(dpy, PictOpOver, src->pict, 0, gradient,
 			 0, 0, 0, 0, 0, 0, win_width, win_height);
-	XSync(dpy, FALSE);
+	XSync(dpy, false);
 	if (!got_bad_drawable) {
 		printf("render_to_gradient: Failed to get BadDrawable with "
 		       "Over\n");
-		return FALSE;
+		return false;
 	} else {
-		got_bad_drawable = FALSE;
+		got_bad_drawable = false;
 	}
 
 	/* Try the copy path to catch bad short-circuiting to 2d. */
 	XRenderComposite(dpy, PictOpSrc, src->pict, 0, gradient,
 			 0, 0, 0, 0, 0, 0, win_width, win_height);
-	XSync(dpy, FALSE);
+	XSync(dpy, false);
 	if (!got_bad_drawable) {
 		printf("render_to_gradient: Failed to get BadDrawable with "
 		       "Src\n");
-		return FALSE;
+		return false;
 	} else {
-		got_bad_drawable = FALSE;
+		got_bad_drawable = false;
 	}
 	XSetErrorHandler(NULL);
 
 	XRenderFreePicture(dpy, gradient);
 
-	return TRUE;
+	return true;
 }
 
 static void gradientPixel(const stop *stops, double pos, unsigned int spread, color4d *result)
@@ -247,14 +247,14 @@ static void calculate_linear_gradient_color(int x, int y,
 
 
 
-Bool linear_gradient_test(Display *dpy, picture_info *win,
+bool linear_gradient_test(Display *dpy, picture_info *win,
                           picture_info *dst, int op, picture_info *dst_color)
 {
     color4d expected, tested, tdst, tgradient;
     int i, s, p, repeat;
     Picture gradient;
     char testname[40];
-    Bool success = True;
+    bool success = true;
 
     for (s = 0; s < n_stop_list; ++s) {
         for (p = 0; p < n_linear_gradient_points; p += 2) {
@@ -321,7 +321,7 @@ Bool linear_gradient_test(Display *dpy, picture_info *win,
                                tgradient.b, tgradient.a,
                                dst_color->color.r, dst_color->color.g,
                                dst_color->color.b, dst_color->color.a);
-                        success = FALSE;
+                        success = false;
                     } else if (is_verbose) {
                         printf("src: %d/%d, dst: %s\n", s, p, dst->name);
                     }

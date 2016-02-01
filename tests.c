@@ -283,12 +283,12 @@ create_formats_list(Display *dpy)
 	describe_format(&name, NULL, format_list[nformats]);
 
 	if (format_whitelist_len != 0) {
-	    Bool ok = FALSE;
+	    bool ok = false;
 	    int j;
 
 	    for (j = 0; j < format_whitelist_len; j++) {
 		if (strcmp(format_whitelist[j], name) == 0) {
-		    ok = TRUE;
+		    ok = true;
 		    break;
 		}
 	    }
@@ -313,7 +313,7 @@ create_formats_list(Display *dpy)
     }
 }
 
-Bool
+bool
 do_tests(Display *dpy, picture_info *win)
 {
 	int i, j, src;
@@ -358,7 +358,7 @@ do_tests(Display *dpy, picture_info *win)
 		pictures_1x1[i].format = format_list[i % nformats];
 		pictures_1x1[i].d = XCreatePixmap(dpy, DefaultRootWindow(dpy),
 		    1, 1, pictures_1x1[i].format->depth);
-		pa.repeat = TRUE;
+		pa.repeat = true;
 		pictures_1x1[i].pict = XRenderCreatePicture(dpy,
 		    pictures_1x1[i].d, pictures_1x1[i].format, CPRepeat, &pa);
 
@@ -462,7 +462,7 @@ do {								\
 	}
 
 	if (enabled_tests & TEST_FILL) {
-		Bool ok, group_ok = TRUE;
+		bool ok, group_ok = true;
 
 		printf("Beginning testing of filling of 1x1R pictures\n");
 		for (i = 0; i < num_tests; i++) {
@@ -480,7 +480,7 @@ do {								\
 	}
 
 	if (enabled_tests & TEST_DSTCOORDS) {
-		Bool ok, group_ok = TRUE;
+		bool ok, group_ok = true;
 
 		printf("Beginning dest coords test\n");
 		for (i = 0; i < 2; i++) {
@@ -494,48 +494,48 @@ do {								\
 	}
 
 	if (enabled_tests & TEST_SRCCOORDS) {
-		Bool ok, group_ok = TRUE;
+		bool ok, group_ok = true;
 
 		printf("Beginning src coords test\n");
-		ok = srccoords_test(dpy, win, argb32white, FALSE);
+		ok = srccoords_test(dpy, win, argb32white, false);
 		RECORD_RESULTS();
 		if (group_ok)
 			success_mask |= TEST_SRCCOORDS;
 	}
 
 	if (enabled_tests & TEST_MASKCOORDS) {
-		Bool ok, group_ok = TRUE;
+		bool ok, group_ok = true;
 
 		printf("Beginning mask coords test\n");
-		ok = srccoords_test(dpy, win, argb32white, TRUE);
+		ok = srccoords_test(dpy, win, argb32white, true);
 		RECORD_RESULTS();
 		if (group_ok)
 			success_mask |= TEST_MASKCOORDS;
 	}
 
 	if (enabled_tests & TEST_TSRCCOORDS) {
-		Bool ok, group_ok = TRUE;
+		bool ok, group_ok = true;
 
 		printf("Beginning transformed src coords test\n");
-		ok = trans_coords_test(dpy, win, argb32white, FALSE);
+		ok = trans_coords_test(dpy, win, argb32white, false);
 		RECORD_RESULTS();
 
 		printf("Beginning transformed src coords test 2\n");
-		ok = trans_srccoords_test_2(dpy, win, argb32white, FALSE);
+		ok = trans_srccoords_test_2(dpy, win, argb32white, false);
 		RECORD_RESULTS();
 		if (group_ok)
 			success_mask |= TEST_TSRCCOORDS;
 	}
 
 	if (enabled_tests & TEST_TMASKCOORDS) {
-		Bool ok, group_ok = TRUE;
+		bool ok, group_ok = true;
 
 		printf("Beginning transformed mask coords test\n");
-		ok = trans_coords_test(dpy, win, argb32white, TRUE);
+		ok = trans_coords_test(dpy, win, argb32white, true);
 		RECORD_RESULTS();
 
 		printf("Beginning transformed mask coords test 2\n");
-		ok = trans_srccoords_test_2(dpy, win, argb32white, TRUE);
+		ok = trans_srccoords_test_2(dpy, win, argb32white, true);
 		RECORD_RESULTS();
 
 		if (group_ok)
@@ -543,7 +543,7 @@ do {								\
 	}
 
 	if (enabled_tests & TEST_BLEND) {
-		Bool ok, group_ok = TRUE;
+		bool ok, group_ok = true;
 
 		for (j = 0; j <= num_dests; j++) {
 		    picture_info *pi;
@@ -566,7 +566,7 @@ do {								\
 	}
 
 	if (enabled_tests & TEST_COMPOSITE) {
-		Bool ok, group_ok = TRUE;
+		bool ok, group_ok = true;
 
 		for (j = 0; j <= num_dests; j++) {
 		    picture_info *pi;
@@ -583,7 +583,7 @@ do {								\
 					test_src, num_test_src,
 					test_mask, num_test_mask,
 					test_dst, num_test_dst,
-					FALSE);
+					false);
 		    RECORD_RESULTS();
 		}
 		if (group_ok)
@@ -591,7 +591,7 @@ do {								\
 	}
 
 	if (enabled_tests & TEST_CACOMPOSITE) {
-		Bool ok, group_ok = TRUE;
+		bool ok, group_ok = true;
 
 		for (j = 0; j <= num_dests; j++) {
 		    picture_info *pi;
@@ -608,7 +608,7 @@ do {								\
 					test_src, num_test_src,
 					test_mask, num_test_mask,
 					test_dst, num_test_dst,
-					TRUE);
+					true);
 		    RECORD_RESULTS();
 		}
 		if (group_ok)
@@ -616,7 +616,7 @@ do {								\
 	}
 
         if (enabled_tests & TEST_GRADIENTS) {
-	    Bool ok, group_ok = TRUE;
+	    bool ok, group_ok = true;
 
 	    printf("Beginning render to linear gradient test\n");
 	    ok = render_to_gradient_test(dpy, &pictures_1x1[0]);
@@ -648,7 +648,7 @@ do {								\
         }
 
         if (enabled_tests & TEST_REPEAT) {
-	    Bool ok, group_ok = TRUE;
+	    bool ok, group_ok = true;
 
             for (i = 0; i < num_ops; i++) {
 		if (ops[i].disabled)
@@ -667,7 +667,7 @@ do {								\
 		     * consisting of colors 1 and 2 (r, g).
 		     */
 		    ok = repeat_test(dpy, win, pi, i, argb32white, argb32red,
-		        argb32green, FALSE);
+		        argb32green, false);
 		    RECORD_RESULTS();
 
                     printf("Beginning %s mask repeat test on %s\n",
@@ -676,7 +676,7 @@ do {								\
 		     * repeating mask consisting of colors 1 and 2 (r, g).
 		     */
 		    ok = repeat_test(dpy, win, pi, i, argb32white, argb32red,
-		        argb32green, TRUE);
+		        argb32green, true);
 		    RECORD_RESULTS();
                 }
             }
@@ -685,7 +685,7 @@ do {								\
         }
 
 	if (enabled_tests & TEST_TRIANGLES) {
-	    Bool ok, group_ok = TRUE;
+	    bool ok, group_ok = true;
 
 	    for (i = 0; i < num_ops; i++) {
 		if (ops[i].disabled)
@@ -723,7 +723,7 @@ do {								\
 	}
 
         if (enabled_tests & TEST_BUG7366) {
-	    Bool ok, group_ok = TRUE;
+	    bool ok, group_ok = true;
 
 	    ok = bug7366_test(dpy);
 	    RECORD_RESULTS();
@@ -733,7 +733,7 @@ do {								\
 	}
 
         if (enabled_tests & TEST_GTK_ARGB_XBGR) {
-		Bool ok, group_ok = TRUE;
+		bool ok, group_ok = true;
 
 		ok = gtk_argb_xbgr_test(dpy);
 		RECORD_RESULTS();
@@ -743,12 +743,12 @@ do {								\
 	}
 
         if (enabled_tests & TEST_LIBREOFFICE_XRGB) {
-		Bool ok, group_ok = TRUE;
+		bool ok, group_ok = true;
 
-		ok = libreoffice_xrgb_test(dpy, FALSE);
+		ok = libreoffice_xrgb_test(dpy, false);
 		RECORD_RESULTS();
 
-		ok = libreoffice_xrgb_test(dpy, TRUE);
+		ok = libreoffice_xrgb_test(dpy, true);
 		RECORD_RESULTS();
 
 		if (group_ok)

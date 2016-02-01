@@ -29,7 +29,7 @@
 /* Test that filling of the 1x1 repeating pictures worked as expected.  This is
  * pretty basic to most of the tests.
  */
-Bool
+bool
 fill_test(Display *dpy, picture_info *win, picture_info *src)
 {
 	color4d tested;
@@ -43,8 +43,8 @@ fill_test(Display *dpy, picture_info *win, picture_info *src)
 	    print_fail(name, &src->color, &tested, 0, 0,
 		       eval_diff(&src->format->direct, &src->color, &tested));
 	    free(name);
-	    return FALSE;
+	    return false;
 	}
 
-	return TRUE;
+	return true;
 }

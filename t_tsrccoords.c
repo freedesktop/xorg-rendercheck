@@ -77,12 +77,12 @@ static void init_transform (XTransform *t)
 
 /* Test drawing a 5x5 source image scaled 8x, as either a source or mask.
  */
-Bool
+bool
 trans_coords_test(Display *dpy, picture_info *win, picture_info *white,
-    Bool test_mask)
+    bool test_mask)
 {
 	color4d tested;
-	Bool failed = FALSE;
+	bool failed = false;
 	int tested_colors[TEST_HEIGHT][TEST_WIDTH], expected_colors[TEST_HEIGHT][TEST_WIDTH];
 	XTransform t;
 	picture_info *src;
@@ -94,13 +94,13 @@ trans_coords_test(Display *dpy, picture_info *win, picture_info *white,
 	 * yet.
 	 */
 	if (win->format->type == PictTypeIndexed) {
-		return TRUE;
+		return true;
 	}
 
 	src = create_dot_picture(dpy);
 	if (src == NULL) {
 		fprintf(stderr, "couldn't allocate picture for test\n");
-		return FALSE;
+		return false;
 	}
 
 	init_transform(&t);
@@ -139,7 +139,7 @@ trans_coords_test(Display *dpy, picture_info *win, picture_info *white,
 			tested_colors[y][x] = 9;
 		}
 		if (tested_colors[y][x] != expected_colors[y][x])
-			failed = TRUE;
+			failed = true;
 	    }
 	}
 

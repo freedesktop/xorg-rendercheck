@@ -29,13 +29,13 @@
 static int
 expecting_error(Display *dpy, XErrorEvent *event)
 {
-    return TRUE;
+    return true;
 }
 
 /**
  * Check SetPictureTransform on a source picture causing a crash.
  */
-static Bool
+static bool
 bug7366_test_set_picture_transform(Display *dpy)
 {
     Picture source_pict;
@@ -48,17 +48,17 @@ bug7366_test_set_picture_transform(Display *dpy)
     memset(&transform, 0, sizeof(transform));
     XRenderSetPictureTransform(dpy, source_pict, &transform);
 
-    XSync(dpy, FALSE);
+    XSync(dpy, false);
 
     XRenderFreePicture(dpy, source_pict);
 
-    return TRUE;
+    return true;
 }
 
 /**
  * Check setting of AlphaMap to a source picture causing a crash.
  */
-static Bool
+static bool
 bug7366_test_set_alpha_map(Display *dpy)
 {
     Picture source_pict, pict;
@@ -76,20 +76,20 @@ bug7366_test_set_alpha_map(Display *dpy)
     XSetErrorHandler(expecting_error);
     pa.alpha_map = source_pict;
     XRenderChangePicture(dpy, pict, CPAlphaMap, &pa);
-    XSync(dpy, FALSE);
+    XSync(dpy, false);
     XSetErrorHandler(NULL);
 
     XFreePixmap(dpy, pixmap);
     XRenderFreePicture(dpy, pict);
     XRenderFreePicture(dpy, source_pict);
 
-    return TRUE;
+    return true;
 }
 
 /**
  * Check SetPictureClipRectangles on a source potentially causing a crash.
  */
-static Bool
+static bool
 bug7366_test_set_picture_clip_rectangles(Display *dpy)
 {
     Picture source_pict;
@@ -102,18 +102,18 @@ bug7366_test_set_picture_clip_rectangles(Display *dpy)
     memset(&rectangle, 0, sizeof(rectangle));
     XSetErrorHandler(expecting_error);
     XRenderSetPictureClipRectangles(dpy, source_pict, 0, 0, &rectangle, 1);
-    XSync(dpy, FALSE);
+    XSync(dpy, false);
     XSetErrorHandler(NULL);
 
     XRenderFreePicture(dpy, source_pict);
 
-    return TRUE;
+    return true;
 }
 
 /**
  * Check SetPictureFilter on a source potentially causing a crash.
  */
-static Bool
+static bool
 bug7366_test_set_picture_filter(Display *dpy)
 {
     Picture source_pict;
@@ -123,15 +123,15 @@ bug7366_test_set_picture_filter(Display *dpy)
     source_pict = XRenderCreateSolidFill(dpy, &color);
 
     XRenderSetPictureFilter(dpy, source_pict, "bilinear", NULL, 0);
-    XSync(dpy, FALSE);
+    XSync(dpy, false);
     XSetErrorHandler(NULL);
 
     XRenderFreePicture(dpy, source_pict);
 
-    return TRUE;
+    return true;
 }
 
-Bool
+bool
 bug7366_test(Display *dpy)
 {
     int maj, min;
@@ -139,7 +139,7 @@ bug7366_test(Display *dpy)
     /* Make sure we actually have gradients available */
     XRenderQueryVersion(dpy, &maj, &min);
     if (maj != 0 || min < 10)
-	return TRUE;
+	return true;
 
     bug7366_test_set_picture_transform(dpy);
     bug7366_test_set_alpha_map(dpy);
@@ -147,5 +147,5 @@ bug7366_test(Display *dpy)
     bug7366_test_set_picture_filter(dpy);
 
     /* If the server isn't gone, then we've succeeded. */
-    return TRUE;
+    return true;
 }

@@ -27,13 +27,13 @@
 /* Test a composite of a given operation, source, mask, and destination picture.
  * Fills the window, and samples from the 0,0 pixel corner.
  */
-Bool
+bool
 composite_test(Display *dpy, picture_info *win, picture_info *dst,
 	       const int *op, int num_op,
 	       const picture_info **src_color, int num_src,
 	       const picture_info **mask_color, int num_mask,
 	       const picture_info **dst_color, int num_dst,
-	       Bool componentAlpha)
+	       bool componentAlpha)
 {
 	color4d expected, tested, tdst, tmsk;
 	char testname[40];
@@ -59,7 +59,7 @@ composite_test(Display *dpy, picture_info *win, picture_info *dst,
 		if (componentAlpha) {
 		    XRenderPictureAttributes pa;
 
-		    pa.component_alpha = TRUE;
+		    pa.component_alpha = true;
 		    XRenderChangePicture(dpy, mask_color[m]->pict,
 					 CPComponentAlpha, &pa);
 		}
@@ -90,7 +90,7 @@ composite_test(Display *dpy, picture_info *win, picture_info *dst,
 		    if (componentAlpha) {
 			XRenderPictureAttributes pa;
 
-			pa.component_alpha = FALSE;
+			pa.component_alpha = false;
 			XRenderChangePicture(dpy, mask_color[m]->pict,
 					     CPComponentAlpha, &pa);
 		    }
@@ -157,7 +157,7 @@ composite_test(Display *dpy, picture_info *win, picture_info *dst,
 				       mask_color[m]->name,
 				       dst->name);
 				XDestroyImage(image);
-				return FALSE;
+				return false;
 			    }
 			}
 		    }
@@ -167,5 +167,5 @@ composite_test(Display *dpy, picture_info *win, picture_info *dst,
 	    }
 	}
 
-	return TRUE;
+	return true;
 }

@@ -70,14 +70,14 @@ static void destroy_target_picture(Display *dpy, picture_info *p)
 /* Test source or mask coordinates by drawing from a 5x5 picture into the 0,0
  * pixel, rotated 90 degrees to the left.
  */
-Bool
+bool
 trans_srccoords_test_2(Display *dpy, picture_info *win, picture_info *white,
-    Bool test_mask)
+    bool test_mask)
 {
 	color4d expected, tested;
 	int i;
 	XRenderPictureAttributes pa;
-	Bool failed = FALSE;
+	bool failed = false;
 	int tested_colors[5][5];
 	picture_info *src;
 	XTransform t;
@@ -86,7 +86,7 @@ trans_srccoords_test_2(Display *dpy, picture_info *win, picture_info *white,
 	src = create_target_picture(dpy);
 	if (src == NULL) {
 		fprintf(stderr, "couldn't allocate picture for test\n");
-		return FALSE;
+		return false;
 	}
 
 	/* Transform that rotates right from the destination coords to the
@@ -111,12 +111,12 @@ trans_srccoords_test_2(Display *dpy, picture_info *win, picture_info *white,
 		 * alpha, the mask color should be written to the
 		 * destination.
 		 */
-		pa.component_alpha = TRUE;
+		pa.component_alpha = true;
 		XRenderChangePicture(dpy, src->pict, CPComponentAlpha,
 		    &pa);
 		XRenderComposite(dpy, PictOpSrc, white->pict, src->pict,
 		    win->pict, 0, 0, 0, 0, 0, 0, 5, 5);
-		pa.component_alpha = FALSE;
+		pa.component_alpha = false;
 		XRenderChangePicture(dpy, src->pict, CPComponentAlpha,
 		    &pa);
 	}
@@ -150,7 +150,7 @@ trans_srccoords_test_2(Display *dpy, picture_info *win, picture_info *white,
 		    print_fail(test_mask ? "mask coords" : "src coords",
 			       &expected, &tested, x, y,
 			       eval_diff(&win->format->direct, &expected, &tested));
-			failed = TRUE;
+			failed = true;
 		}
 	}
 	if (failed) {

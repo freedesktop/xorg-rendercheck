@@ -39,8 +39,8 @@
 #define PIXEL_ARGB		0xff886644
 #define INVERT_PIXEL_ARGB	0xff7799bb
 
-Bool
-libreoffice_xrgb_test(Display *dpy, Bool invert)
+bool
+libreoffice_xrgb_test(Display *dpy, bool invert)
 {
 	int x, y;
 	Pixmap	src_pix, dst_pix;
@@ -100,7 +100,7 @@ libreoffice_xrgb_test(Display *dpy, Bool invert)
 
 	if (!pic_argb_format || !pic_xrgb_format || !pic_rgb_format) {
 		printf("Couldn't find xRGB and ARGB formats\n");
-		return FALSE;
+		return false;
 	}
 
 	src_pix = XCreatePixmap(dpy, RootWindow(dpy, DefaultScreen(dpy)),
@@ -155,11 +155,11 @@ libreoffice_xrgb_test(Display *dpy, Bool invert)
 				printf("fail: pixel value is %08lx, "
 				       "should be %08lx\n",
 				       pixel, expected);
-				return FALSE;
+				return false;
 			}
 		}
 	}
 	XDestroyImage(image);
 
-	return TRUE;
+	return true;
 }
