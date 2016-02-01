@@ -23,7 +23,7 @@ XORG_TESTSET_CFLAG(CWARNFLAGS, [-Wno-shadow])
 AC_CHECK_HEADERS([err.h])
 
 # Checks for pkg-config packages
-PKG_CHECK_MODULES(RC, [xrender x11 xproto >= 7.0.17])
+PKG_CHECK_MODULES(RC, [xrender xext x11 xproto >= 7.0.17])
 
 AC_CONFIG_FILES([Makefile
                  man/Makefile])

@@ -229,8 +229,6 @@ argb_fill(Display *dpy, picture_info *p, int x, int y, int w, int h, float a,
 	XRenderFillRectangle(dpy, PictOpSrc, p->pict, &rendercolor, x, y, w, h);
 }
 
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-
 /* Create a set of direct format XRenderPictFormats for later use.  This lets
  * us get more formats than just the standard required set, and lets us attach
  * names to them.

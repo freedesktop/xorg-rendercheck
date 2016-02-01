@@ -16,6 +16,7 @@ rendercheck_SOURCES = \
 	t_gtk_argb_xbgr.c \
 	t_libreoffice_xrgb.c \
 	t_repeat.c \
+	t_shmblend.c \
 	t_srccoords.c \
 	t_tsrccoords.c \
 	t_tsrccoords2.c \

@@ -24,6 +24,7 @@
 #include <X11/extensions/Xrender.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #if HAVE_ERR_H
 # include <err.h>
@@ -44,6 +45,7 @@ static inline void errx(int eval, const char *fmt, ...) {
 
 #define min(a, b) (a < b ? a : b)
 #define max(a, b) (a > b ? a : b)
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 typedef struct _color4d
 {
@@ -92,6 +94,7 @@ record_result(struct rendercheck_test_result *result, bool success)
 #define TEST_BUG7366		0x1000
 #define TEST_gtk_argb_xbgr	0x2000
 #define TEST_libreoffice_xrgb	0x4000
+#define TEST_shmblend		0x8000
 
 struct rendercheck_test {
 	int bit;
