@@ -31,8 +31,8 @@
 #define PIXEL_ABGR	0xff886644
 #define PIXEL_RGB	0x446688
 
-bool
-gtk_argb_xbgr_test(Display *dpy)
+static struct rendercheck_test_result
+test_gtk_argb_xbgr(Display *dpy)
 {
 	int x, y;
 	Pixmap	pix_32;
@@ -46,6 +46,7 @@ gtk_argb_xbgr_test(Display *dpy)
 	XRenderPictFormat	*pic_rgb_format;
 	GC	gc_32;
 	XImage	*image_24, *image_32;
+	struct rendercheck_test_result result = {};
 
 	templ.type = PictTypeDirect;
 	templ.depth = 32;
@@ -95,7 +96,8 @@ gtk_argb_xbgr_test(Display *dpy)
 
 	if (!pic_argb_format || !pic_xbgr_format || !pic_rgb_format) {
 		printf("Couldn't find xBGR and ARGB formats\n");
-		return false;
+		record_result(&result, false);
+		return result;
 	}
 
 	pix_32 = XCreatePixmap(dpy, RootWindow(dpy, DefaultScreen(dpy)),
@@ -141,10 +143,15 @@ gtk_argb_xbgr_test(Display *dpy)
 				printf("fail: pixel value is %08lx "
 				    "should be %08x\n",
 				    pixel, PIXEL_RGB);
-				return false;
+				record_result(&result, false);
+				return result;
 			}
 		}
 	}
 
-	return true;
+	record_result(&result, true);
+	return result;
 }
+
+DECLARE_RENDERCHECK_ARG_TEST(gtk_argb_xbgr, "GTK xRGB/ABGR same picture",
+			     test_gtk_argb_xbgr);

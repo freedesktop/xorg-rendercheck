@@ -121,10 +121,20 @@ struct {
     {TEST_REPEAT, "repeat"},
     {TEST_TRIANGLES, "triangles"},
     {TEST_BUG7366, "bug7366"},
-    {TEST_GTK_ARGB_XBGR, "gtk_argb_xbgr"},
-    {TEST_LIBREOFFICE_XRGB, "libreoffice_xrgb"},
     {0, NULL}
 };
+
+static void
+print_test_separator(int i)
+{
+        if (i % 5 == 0) {
+            if(i != 0)
+                putc('\n', stderr);
+            putc('\t', stderr);
+        } else {
+            fprintf(stderr, ", ");
+        }
+}
 
 void print_tests(FILE *file, int tests) {
     int i, j;
@@ -132,14 +142,15 @@ void print_tests(FILE *file, int tests) {
     for (i=0, j=0; available_tests[i].name; i++) {
         if (!(available_tests[i].flag & tests))
             continue;
-        if (j % 5 == 0) {
-            if(j != 0)
-                putc('\n', stderr);
-            putc('\t', stderr);
-        } else {
-            fprintf(stderr, ", ");
-        }
+	print_test_separator(j++);
         fprintf(stderr, "%s", available_tests[i].name);
+        j++;
+    }
+    for_each_test(test) {
+	if (!(test->bit & tests))
+	    continue;
+	print_test_separator(j++);
+        fprintf(stderr, "%s", test->arg_name);
         j++;
     }
     if (j)
@@ -169,7 +180,7 @@ int main(int argc, char **argv)
 	XSetWindowAttributes as;
 	picture_info window;
 	char *display = NULL;
-	char *test, *format, *opname, *nextname;
+	char *test_name, *format, *opname, *nextname;
 
 	static struct option longopts[] = {
 		{ "display",	required_argument,	NULL,	'd' },
@@ -239,15 +250,25 @@ int main(int argc, char **argv)
 			/* disable all tests */
 			enabled_tests = 0;
 
-			while ((test = strsep(&nextname, ",")) != NULL) {
+			while ((test_name = strsep(&nextname, ",")) != NULL) {
 				int i;
+				bool found = false;
 				for(i=0; available_tests[i].name; i++) {
-					if(strcmp(test, available_tests[i].name) == 0) {
+					if(strcmp(test_name, available_tests[i].name) == 0) {
 						enabled_tests |= available_tests[i].flag;
+						found = true;
 						break;
 					}
 				}
-				if(available_tests[i].name == NULL)
+				for_each_test(test) {
+					if (strcmp(test_name,
+						   test->arg_name) == 0) {
+						enabled_tests |= test->bit;
+						found = true;
+						break;
+					}
+				}
+				if (!found)
 					usage(argv[0]);
 			}
 

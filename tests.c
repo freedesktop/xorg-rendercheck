@@ -462,6 +462,20 @@ do {								\
 	    test_dst[num_test_dst++] = &pictures_solid[i];
 	}
 
+	for_each_test(test) {
+		struct rendercheck_test_result result;
+
+		if (!(enabled_tests & test->bit))
+			continue;
+
+		result = test->func(dpy);
+		tests_total += result.tests;
+		tests_passed += result.passed;
+
+		if (result.tests == result.passed)
+			success_mask |= test->bit;
+	}
+
 	if (enabled_tests & TEST_FILL) {
 		bool ok, group_ok = true;
 
@@ -731,29 +745,6 @@ do {								\
 
 	    if (group_ok)
 		success_mask |= TEST_BUG7366;
-	}
-
-        if (enabled_tests & TEST_GTK_ARGB_XBGR) {
-		bool ok, group_ok = true;
-
-		ok = gtk_argb_xbgr_test(dpy);
-		RECORD_RESULTS();
-
-		if (group_ok)
-			success_mask |= TEST_GTK_ARGB_XBGR;
-	}
-
-        if (enabled_tests & TEST_LIBREOFFICE_XRGB) {
-		bool ok, group_ok = true;
-
-		ok = libreoffice_xrgb_test(dpy, false);
-		RECORD_RESULTS();
-
-		ok = libreoffice_xrgb_test(dpy, true);
-		RECORD_RESULTS();
-
-		if (group_ok)
-			success_mask |= TEST_LIBREOFFICE_XRGB;
 	}
 
 	free(test_ops);

@@ -64,6 +64,19 @@ struct op_info {
 	bool disabled;
 };
 
+struct rendercheck_test_result {
+	int tests;
+	int passed;
+};
+
+static inline void
+record_result(struct rendercheck_test_result *result, bool success)
+{
+	result->tests++;
+	if (success)
+		result->passed++;
+}
+
 #define TEST_FILL		0x0001
 #define TEST_DSTCOORDS		0x0002
 #define TEST_SRCCOORDS		0x0004
@@ -77,8 +90,27 @@ struct op_info {
 #define TEST_REPEAT	  	0x0400
 #define TEST_TRIANGLES  	0x0800
 #define TEST_BUG7366		0x1000
-#define TEST_GTK_ARGB_XBGR	0x2000
-#define TEST_LIBREOFFICE_XRGB	0x4000
+#define TEST_gtk_argb_xbgr	0x2000
+#define TEST_libreoffice_xrgb	0x4000
+
+struct rendercheck_test {
+	int bit;
+	const char *arg_name;
+	const char *long_name;
+	struct rendercheck_test_result (*func)(Display *dpy);
+};
+
+#define DECLARE_RENDERCHECK_TEST(name)		  \
+	const struct rendercheck_test test_desc_##name \
+	__attribute__ ((section ("test_section")))
+
+#define DECLARE_RENDERCHECK_ARG_TEST(arg_name_, long_name_, func_)		\
+	DECLARE_RENDERCHECK_TEST(arg_name_) = {				\
+		.bit = TEST_##arg_name_,				\
+		.arg_name = #arg_name_,					\
+		.long_name = long_name_,				\
+		.func = func_,						\
+	}
 
 struct render_format {
 	XRenderPictFormat *format;
@@ -87,6 +119,12 @@ struct render_format {
 
 extern struct render_format *formats;
 extern int nformats;
+
+/* Storage that will point at the start and end of the ELF section for test
+ * structs.  These are automatically set up by the linker when placing things
+ * in their sections.
+ */
+extern struct rendercheck_test __start_test_section, __stop_test_section;
 
 extern int pixmap_move_iter;
 extern int win_width, win_height;
@@ -226,8 +264,7 @@ trifan_test(Display *dpy, picture_info *win, picture_info *dst, int op,
 bool
 bug7366_test(Display *dpy);
 
-bool
-gtk_argb_xbgr_test(Display *dpy);
-
-bool
-libreoffice_xrgb_test(Display *dpy, bool invert);
+#define for_each_test(test)						\
+	for (struct rendercheck_test *test = &__start_test_section;	\
+	     test < &__stop_test_section;				\
+	     test++)

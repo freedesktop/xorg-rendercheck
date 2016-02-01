@@ -39,8 +39,8 @@
 #define PIXEL_ARGB		0xff886644
 #define INVERT_PIXEL_ARGB	0xff7799bb
 
-bool
-libreoffice_xrgb_test(Display *dpy, bool invert)
+static bool
+libreoffice_xrgb_test_one(Display *dpy, bool invert)
 {
 	int x, y;
 	Pixmap	src_pix, dst_pix;
@@ -163,3 +163,17 @@ libreoffice_xrgb_test(Display *dpy, bool invert)
 
 	return true;
 }
+
+static struct rendercheck_test_result
+test_libreoffice_xrgb(Display *dpy)
+{
+	struct rendercheck_test_result result = { };
+
+	record_result(&result, libreoffice_xrgb_test_one(dpy, false));
+	record_result(&result, libreoffice_xrgb_test_one(dpy, true));
+
+	return result;
+}
+
+DECLARE_RENDERCHECK_ARG_TEST(libreoffice_xrgb, "LibreOffice xRGB",
+			     test_libreoffice_xrgb);
