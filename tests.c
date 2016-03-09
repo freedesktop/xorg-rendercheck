@@ -271,8 +271,8 @@ create_formats_list(Display *dpy)
 	/* Our testing code isn't all that hot, so don't bother trying at
 	 * the low depths yet.
 	 */
-	if ((redbits >= 1 && redbits <= 4) ||
-	    (alphabits >= 1 && alphabits <= 4))
+	if ((redbits >= 1 && redbits < 4) ||
+	    (alphabits >= 1 && alphabits < 4))
 	{
 	    continue;
 	}
