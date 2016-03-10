@@ -243,7 +243,7 @@ create_formats_list(Display *dpy)
     memset(&templ, 0, sizeof(templ));
     templ.type = PictTypeDirect;
 
-    formats = malloc(sizeof(*formats) * nformats_allocated);
+    formats = calloc(sizeof(*formats), nformats_allocated);
     if (formats == NULL)
 	errx(1, "malloc error");
     nformats = 0;
@@ -744,6 +744,24 @@ do {								\
 	    if (group_ok)
 		success_mask |= TEST_BUG7366;
 	}
+
+	for (i = 0; i < num_colors * nformats; i++) {
+	    free(pictures_1x1[i].name);
+	    free(pictures_10x10[i].name);
+	}
+	free(pictures_1x1);
+	free(pictures_10x10);
+	free(pictures_solid);
+
+	for (i = 0; i < num_dests; i++) {
+	    free(dests[i].name);
+	}
+	free(dests);
+
+	for (i = 0; i < nformats; i++) {
+	    free(formats[i].name);
+	}
+	free(formats);
 
 	free(test_ops);
 	free(test_src);

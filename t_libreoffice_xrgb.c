@@ -160,6 +160,7 @@ libreoffice_xrgb_test_one(Display *dpy, bool invert)
 		}
 	}
 	XDestroyImage(image);
+	XFreeGC(dpy, gc);
 
 	return true;
 }

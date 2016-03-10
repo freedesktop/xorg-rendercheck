@@ -31,7 +31,7 @@ bool is_verbose = false, minimalrendering = false;
 int enabled_tests = ~0;		/* Enable all tests by default */
 
 int format_whitelist_len = 0;
-char **format_whitelist;
+char **format_whitelist = NULL;
 
 /* Number of times to repeat operations so that pixmaps will tend to get moved
  * into offscreen memory and allow hardware acceleration.
@@ -173,7 +173,7 @@ int main(int argc, char **argv)
 {
 	Display *dpy;
 	XEvent ev;
-	int i, o, maj, min;
+	int i, o, maj, min, ret = 1;
 	static int is_sync = false, print_version = false;
 	static int longopt_minimalrendering = 0;
 	XWindowAttributes a;
@@ -346,12 +346,18 @@ int main(int argc, char **argv)
 	while (XNextEvent(dpy, &ev) == 0) {
 		if (ev.type == Expose && !ev.xexpose.count) {
 			if (do_tests(dpy, &window))
-				exit(0);
+				ret = 0;
 			else
-				exit(1);
+				ret = 1;
+			break;
 		}
 	}
 
+	free(window.name);
+	for (i = 0; i < format_whitelist_len; i++)
+		free(format_whitelist[i]);
+	free(format_whitelist);
+
         XCloseDisplay(dpy);
-	return 0;
+	return ret;
 }

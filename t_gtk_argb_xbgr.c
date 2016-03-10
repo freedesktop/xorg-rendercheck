@@ -149,6 +149,12 @@ test_gtk_argb_xbgr(Display *dpy)
 		}
 	}
 
+	free(image_32->data);
+	XFree(image_32);
+	XFree(image_24->data);
+	XFree(image_24);
+	XFreeGC(dpy, gc_32);
+
 	record_result(&result, true);
 	return result;
 }
