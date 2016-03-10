@@ -279,6 +279,11 @@ create_formats_list(Display *dpy)
 
 	describe_format(&formats[nformats].name, NULL, format);
 
+	if (format == XRenderFindStandardFormat(dpy, PictStandardARGB32))
+	{
+	    argb32index = nformats;
+	}
+
 	if (format_whitelist_len != 0) {
 	    bool ok = false;
 	    int j;
@@ -292,15 +297,12 @@ create_formats_list(Display *dpy)
 	    if (!ok) {
 		printf("Ignoring server-supported format: %s\n",
 		       formats[nformats].name);
-		free(formats[nformats].name);
-		formats[nformats].name = NULL;
+		if (nformats != argb32index) {
+		    free(formats[nformats].name);
+		    formats[nformats].name = NULL;
+		}
 		continue;
 	    }
-	}
-
-	if (format == XRenderFindStandardFormat(dpy, PictStandardARGB32))
-	{
-	    argb32index = nformats;
 	}
 
 	printf("Found server-supported format: %s\n", formats[nformats].name);
