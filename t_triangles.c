@@ -36,6 +36,12 @@
 static void
 get_dest_color (int op, color4d *in, color4d *out)
 {
+	if (op >= PictOpConjointMinimum && op <= PictOpConjointMaximum)
+	    op -= PictOpConjointMinimum;
+
+	if (op >= PictOpDisjointMinimum && op <= PictOpDisjointMaximum)
+	    op -= PictOpDisjointMinimum;
+
 	switch (op) {
 		case PictOpSrc:
 		case PictOpClear:
